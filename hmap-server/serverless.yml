@@ -1,0 +1,49 @@
+service: hmap-server
+frameworkVersion: '3'
+
+# custom:
+#   tableName: 'options-table'
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  # iam:
+  #   role:
+  #     statements:
+  #       - Effect: Allow
+  #         Action:
+  #           - dynamodb:Query
+  #           - dynamodb:Scan
+  #           - dynamodb:GetItem
+  #           - dynamodb:PutItem
+  #           - dynamodb:UpdateItem
+  #           - dynamodb:DeleteItem
+  #         Resource:
+  #           - Fn::GetAtt: [ OptionsTable, Arn ]
+  environment:
+    # USERS_TABLE: ${self:custom.tableName}
+    TRADIER_KEY: ${ssm:tradier-api-key}
+
+functions:
+  api:  
+    handler: index.handler
+    events:
+      - httpApi: '*'
+
+# resources:
+#   Resources:
+#     OptionsTable:
+#       Type: AWS::DynamoDB::Table
+#       Properties:
+#         AttributeDefinitions:
+#           - AttributeName: userId
+#             AttributeType: S
+#         KeySchema:
+#           - AttributeName: userId
+#             KeyType: HASH
+#         BillingMode: PAY_PER_REQUEST
+#         TableName: ${self:custom.tableName}
