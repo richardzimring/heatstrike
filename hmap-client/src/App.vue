@@ -3,6 +3,7 @@
 // import TheWelcome from './components/TheWelcome.vue'
 
 import axios from 'axios';
+import { type GetDataResponse } from "./types/types";
 
 // const tradierKey = 'Bearer ' + process.env.VITE_TRADIER_KEY
 // export tradier_key="3AljpLEMJRAGWauIXPgqz5U1HmcA"
@@ -17,83 +18,41 @@ export default {
       selectedTicker: 'TSLA',
       selectedDirection: 'call',
       selectedMetric: 'delta',
-      // TODO: make seperate API call to get live stock price and stock info
       stockData: {
         ticker: '',
-        fullName: '',
+        description: '',
         price: 0,
       },
       optionsData: {
-        expirationDates: [],
-        strikes: [],
-        chains: [{}],
+        expirationDates: [''],
+        strikes: [0],
+        chains: [[{}]],
       },
       displayData: {}
     }
   },
   methods: {
 
-    async fetchExpirationDates(ticker: string) {
-      try {
-        const endpoint = 'https://sandbox.tradier.com/v1/markets/options/expirations'
-        const response = await axios.get(endpoint, {
-          params: { symbol: ticker },
-          headers: { Authorization: `Bearer ${tradierKey}`, Accept: 'application/json' }
-        });
-
-        this.optionsData.expirationDates = response.data.expirations.date
-      }
-      catch (error) {
-        console.log(error)
-      }
-    },
-
-    // send requests to Tradier API in parallel
-    // Tradier greeks only updates once per hour during market hours
-    // TODO: Cache data in DB 
-    // if market is open, check if DB has the option chain within the last hour
-    // if market is closed, check if DB has the option chain within the last 24 hours
-    // to avoid sending unnecessary requests
     async fetchOptionData(ticker: string) {
       try {
-        const endpoint = 'https://sandbox.tradier.com/v1/markets/options/chains'
-        const requests = this.optionsData.expirationDates.map((date: string) => {
-          return axios.get(endpoint, {
-            params: {
-              symbol: ticker,
-              expiration: date,
-              greeks: true
-            },
-            headers: {
-              Authorization: `Bearer ${tradierKey}`,
-              Accept: 'application/json'
-            }
-          });
-        });
-        
-        const responses = await axios.all(requests)
+        const endpoint = `https://2i7z2aank8.execute-api.us-east-2.amazonaws.com/data/${ticker}`
+        const response: GetDataResponse = await axios.get(endpoint);
 
-        // filter response to relevent metrics
-        this.optionsData.chains = responses
-          .map((response: any) => response.data.options.option)
-          .map((chain: any) => chain.map((option: any) => {
-            return {
-              symbol: option.symbol,
-              strike: option.strike,
-              option_type: option.option_type,
-              volume: option.volume,
-              open_interest: option.open_interest,
-              delta: option.greeks.delta,
-              gamma: option.greeks.gamma,
-              theta: option.greeks.theta,
-              vega: option.greeks.vega,
-              rho: option.greeks.rho,
-              phi: option.greeks.phi,
-              updated_at: option.greeks.updated_at,
-            };
-          }));
-        
-      } catch (error) {
+        // update Vue object
+        this.stockData.ticker = response.data.symbol
+        this.stockData.description = response.data.description
+        this.stockData.price = response.data.price
+        this.optionsData.expirationDates = response.data.expirationDates
+        this.optionsData.strikes = response.data.strikes
+        this.optionsData.chains = response.data.options
+
+      }
+      catch (error) {
+
+        // if (error.message === 'Invalid ticker') {
+
+        // }
+
         console.log(error)
       }
     },
@@ -114,7 +73,6 @@ export default {
   // },
 
   async mounted() {
-    await this.fetchExpirationDates(this.selectedTicker)
     await this.fetchOptionData(this.selectedTicker)
     this.filterToDisplay(this.selectedDirection, this.selectedMetric)
   }
@@ -124,7 +82,22 @@ export default {
 <template>
   <!-- {{optionsData.expirationDates}} -->
 
-  {{displayData}}
+  <!-- // update Vue object
+        this.stockData.ticker = response.data.symbol
+        this.stockData.description = response.data.description
+        this.stockData.price = response.data.price
+        this.optionsData.expirationDates = response.data.expirationDates
+        this.optionsData.strikes = response.data.strikes
+        this.optionsData.chains = response.data.options -->
+
+  ticker: {{stockData.ticker}} <br>
+  description: {{stockData.description}} <br>
+  price: {{stockData.price}} <br>
+  expirationDates: {{optionsData.expirationDates}} <br>
+  strikes: {{optionsData.strikes}} <br>
+  <!-- data to display: {{displayData}} -->
+
+
   <!-- <header>
     <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
 

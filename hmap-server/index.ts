@@ -15,6 +15,8 @@ import { fetchQuote } from "./requests/getQuote";
 app.use(express.json());
 
 app.get("/data/:ticker", async function (req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
+
   const ticker = req.params.ticker;
 
   try {
@@ -29,10 +31,11 @@ app.get("/data/:ticker", async function (req, res) {
     const optionDataPromise = fetchOptionData(ticker, expirationDates);
 
     // make requests concurrently
-    const [quoteData, optionData] = await Promise.all([quoteDataPromise, optionDataPromise])
+    const [stockData, optionData] = await Promise.all([quoteDataPromise, optionDataPromise])
 
     res.json({
-      ...quoteData,
+      ...stockData,
+      expirationDates,
       ...optionData
     });
 
