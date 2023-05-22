@@ -1,6 +1,20 @@
 import { GetDataResponse, Option, Stock } from './types'
 import axios from 'axios';
 
+const emptyDataResponse = (ticker: string, description: string): GetDataResponse => {
+  return {
+    ticker: ticker,
+    description: description,
+    updated_at: '?',
+    price: '?',
+    change_percentage: '+?',
+    expirationDates: Array(6).fill(''),
+    expirationDatesStringified: Array(6).fill(''),
+    strikes: Array(6).fill(''),
+    options: []
+  };
+}
+
 export const fetchOptionData = async (ticker: string): Promise<GetDataResponse> => {
   try {
     const endpoint = `https://2i7z2aank8.execute-api.us-east-2.amazonaws.com/data/${ticker}`
@@ -9,14 +23,15 @@ export const fetchOptionData = async (ticker: string): Promise<GetDataResponse> 
     const responseData: GetDataResponse = response.data;
     return responseData;
   }
-  catch (error) {
-
-    // if (error.message === 'Invalid ticker') {
-      // TODO: handle this
-    // }
-    throw error;
-
-    console.log(error)
+  catch (error: any) {
+    if (error.response.data.message === 'Invalid ticker') {
+      console.log(`Invalid ticker: ${ticker}.`)
+      return emptyDataResponse(ticker, 'Invalid ticker')
+    }
+    else {
+      console.log(`Error fetching data for ${ticker}.`)
+      return emptyDataResponse(ticker, 'Error fetching data')
+    }
   }
 }
 

@@ -10,6 +10,11 @@ export async function fetchQuote(ticker: string): Promise<QuoteSummary> {
     headers: { Authorization: `Bearer ${TRADIER_KEY}`, Accept: 'application/json' }
   });
   
+  // handle invalid ticker
+  if (response.data.quotes.unmatched_symbols) {
+    throw new Error('Invalid ticker')
+  }
+
   const quote = response.data.quotes.quote;
 
   return {

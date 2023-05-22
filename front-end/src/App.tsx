@@ -9,6 +9,7 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
+import Form from 'react-bootstrap/Form';
 import { initTicker, initStockData, initData, initChartData } from './init/init'
 import { capitalize, stringifyMetric, fetchOptionData } from './utils'
 import { Option } from './types'
@@ -26,29 +27,38 @@ const App = (): JSX.Element => {
   const [changeType, setChangeType] = React.useState('ticker')
   const [chartData, setChartData] = React.useState([initChartData])
   const [stockInfo, setStockInfo] = React.useState(initStockData)
+  const [tickerEntered, setTickerEntered] = React.useState('AAPL')
 
   // update chart when ticker, direction, or metric changes
   React.useEffect(() => {
     changeChartData()
   }, [stockInfo, direction, metric])
 
+  // TODO: handle invalid tickers
   const loadNewStock = async (ticker: string): Promise<void> => {
     console.log(`ticker: ${ticker}`)
-    setChangeType('ticker')
+    const newData = await fetchOptionData(ticker);
 
-    const data = await fetchOptionData(initTicker);
-    setData(data)
+    // check if API returned an error
+    if (newData.options.length === 0) {
+      // reset ticker to previous value
+      setTickerEntered(stockInfo.ticker)
+    }
+    else {
+      setChangeType('ticker')
+      setData(newData)
 
-    // parse stock info from API response
-    const stockInfo = {
-      ticker: data.ticker,
-      description: data.description,
-      price: data.price,
-      change_percentage: data.change_percentage
-    };
-    setStockInfo(stockInfo)
+      // parse stock info from API response
+      const stockInfo = {
+        ticker: newData.ticker,
+        description: newData.description,
+        price: newData.price,
+        change_percentage: newData.change_percentage
+      };
 
-    console.log('Loaded data from API.')
+      setStockInfo(stockInfo)
+      console.log('Loaded data from API.')
+    }
   }
 
   const changeDirection = (direction: string | null): void => {
@@ -87,7 +97,7 @@ const App = (): JSX.Element => {
         tooltipContent: `<b>strike: </b>$${option.strike}<br>
                         <b>date: </b>${option.date_str}<br>
                         <b>${metricStr.toLowerCase()}: </b>${option[metric as keyof typeof option]}`
-      })).reverse();
+      }));
     console.log('setting chart data')
     setChartData(chartData)
   }
@@ -99,23 +109,22 @@ const App = (): JSX.Element => {
           <Row
             className='d-flex justify-content-center'
             style={{
-              padding: '1.5% 32% 1.5% 34%',
+              padding: '1.5% 34% 1.5% 34%',
               backgroundColor: '#2f343d',
               position: 'static'
             }}
           >
             <Col>
-              {/* <Typeahead
-                defaultSelected={[initTicker]}
-                onChange={(t) => {
-                  t[0] ? loadNewStock(t[0] as string) : console.log('ticker: [empty]')
-                }}
-                emptyLabel='Ticker not found.'
-                highlightOnlyResult={false}
-                minLength={1}
-                options={tickers}
-                id='autocomplete-search'
-              /> */}
+              <input
+                type="text"
+                id="ticker"
+                name="ticker"
+                placeholder="Ticker"
+                value={tickerEntered}
+                onChange = {e => setTickerEntered(e.target.value.toUpperCase())}
+                onKeyDown={e => e.key === 'Enter' ? loadNewStock(tickerEntered) : null}
+                style={{ width: '85%', height: '100%', fontSize: '1rem' }}
+              />
             </Col>
             <Col>
               <DropdownButton

@@ -33,6 +33,7 @@ export interface QuotesResponse {
   data: {
     quotes: {
       quote: Quote;
+      unmatched_symbols?: string[];
     };
   };
 }

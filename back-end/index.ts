@@ -20,6 +20,11 @@ app.get("/data/:ticker", async function (req, res) {
 
   const ticker = req.params.ticker;
 
+  // TODO: check if ticker has been cached with an `accessed_date` within the last TRADING hour
+  // including invalid tickers
+  // TODO: implement dynamoDB caching
+
+
   try {
     // get expiration dates
     const expirationDatesPromise = fetchExpirationDates(ticker);
@@ -46,7 +51,7 @@ app.get("/data/:ticker", async function (req, res) {
 
   } catch (error) {
     console.log(error);
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ message: error.message });
   }
 });
 

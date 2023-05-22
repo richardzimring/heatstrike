@@ -188,16 +188,9 @@ export const Heatmap = (props: HeatmapData): JSX.Element => {
         yPad = 0
       }
 
-      // print to console if x(d.date_str) is undefined
-      data.filter(d => d.value !== '').forEach( (d) => {
-            if (y(d.strike) === undefined) {
-              console.log(`x(${d.strike}) is undefined`);
-            }
-          });
-
       // draw rectangles
       svg.selectAll()
-        .data(data.filter(d => d.value !== '')) // option doesn't exist for this strike and date
+        .data(data.filter(d => d.value !== '')) // option exists for this strike and date
         .join('rect')
         .attr('x', d => x(d.date_str) ?? '')
         .attr('y', d => y(d.strike) ?? '')

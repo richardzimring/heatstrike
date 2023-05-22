@@ -51,24 +51,24 @@ export async function fetchOptionData(ticker: string, stockPrice: number, expira
     }));
 
   // get unique strikes from all option chains
-  const uniqueStrikes = [...new Set(filtered.flatMap(options => options.map(option => parseFloat(option.strike))))].sort((a, b) => (a - b)).map(strike => strike.toString());
+  const uniqueStrikes = [...new Set(filtered.flatMap(options => options.map(option => parseFloat(option.strike))))].sort((a, b) => (a - b)).map(strike => strike.toString())
+    // only integer strikes
+    .filter(strike => !strike.includes('.'));
 
   // get index of strike closest in value to stock price
   const stockPriceIndex = uniqueStrikes.findIndex(strike => parseFloat(strike) > stockPrice);
   
   const desiredStrikes = uniqueStrikes
-    // only integer strikes
-    .filter(strike => !strike.includes('.'))
     // only strikes within 5 strikes of the current stock price
-    .filter((strike, index) => Math.abs(index - stockPriceIndex) < 5).map(strike => strike.toString());
+    .filter((strike, index) => Math.abs(index - stockPriceIndex) <= 5).map(strike => strike.toString());
 
-  // Populate output with empty options
+  // initialize output with empty options
   let formatted: OptionChain[] = Array(expirationDates.length);
   for (let d = 0; d < expirationDates.length; d++) {
     let date = expirationDates[d];
     let date_str = expirationDatesStringified[d];
 
-    // Initialize output structure
+    // initialize output structure
     formatted[d] = {
       calls: Array(desiredStrikes.length),
       puts: Array(desiredStrikes.length)
@@ -80,7 +80,7 @@ export async function fetchOptionData(ticker: string, stockPrice: number, expira
     };
   }
 
-  // Populate output with existing option data
+  // populate output with existing option data
   for (let d = 0; d < expirationDates.length; d++) {
     for (let s = 0; s < desiredStrikes.length; s++) {
       let strike = desiredStrikes[s];
