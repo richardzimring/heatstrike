@@ -22,17 +22,20 @@ app.get("/data/:ticker", async function (req, res) {
 
   try {
     // get expiration dates
-    const expirationDates = await fetchExpirationDates(ticker);
-    const expirationDatesStringified = stringifyDates(expirationDates);
+    const expirationDatesPromise = fetchExpirationDates(ticker);
 
     // get general stock info data
     const quoteDataPromise = fetchQuote(ticker);
+    
+    // fetch data concurrently
+    let [expirationDates, stockData] = await Promise.all([expirationDatesPromise, quoteDataPromise]);
+
+    // save at most the first 8 expiration dates
+    expirationDates = expirationDates.slice(0, 8);
+    const expirationDatesStringified = stringifyDates(expirationDates);
   
     // get options chains
-    const optionDataPromise = fetchOptionData(ticker, expirationDates, expirationDatesStringified);
-
-    // make requests concurrently
-    const [stockData, optionData] = await Promise.all([quoteDataPromise, optionDataPromise])
+    const optionData = await fetchOptionData(ticker, parseFloat(stockData.price), expirationDates, expirationDatesStringified);
 
     res.json({
       ...stockData,

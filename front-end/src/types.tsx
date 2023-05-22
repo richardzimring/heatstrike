@@ -18,6 +18,8 @@ export interface HeatmapData {
   metric_str: string
   direction: string
   data: ChartData[]
+  dates: string[]
+  strikes: string[]
   dims: Dims
   changeType: string
 }
@@ -45,6 +47,11 @@ export interface Option {
   phi: string
 }
 
+export interface OptionChain {
+  calls: Option[];
+  puts: Option[];
+}
+
 export interface GetDataResponse {
   ticker: string;
   description: string;
@@ -53,6 +60,6 @@ export interface GetDataResponse {
   change_percentage: string;
   expirationDates: string[];
   expirationDatesStringified: string[];
-  strikes: number[];
-  options: Option[];
+  strikes: string[];
+  options: OptionChain[];
 }

@@ -1,21 +1,13 @@
-import { GetDataResponse, Stock } from './types'
+import { GetDataResponse, Option, Stock } from './types'
 import axios from 'axios';
 
 export const fetchOptionData = async (ticker: string): Promise<GetDataResponse> => {
   try {
     const endpoint = `https://2i7z2aank8.execute-api.us-east-2.amazonaws.com/data/${ticker}`
+    // const endpoint = `http://localhost:3000/data/${ticker}`
     const response = await axios.get(endpoint);
     const responseData: GetDataResponse = response.data;
     return responseData;
-
-    // update Vue object
-    // this.stockData.ticker = response.data.symbol
-    // this.stockData.description = response.data.description
-    // this.stockData.price = response.data.price
-    // this.optionsData.expirationDates = response.data.expirationDates
-    // this.optionsData.strikes = response.data.strikes
-    // this.optionsData.chains = response.data.options
-
   }
   catch (error) {
 

@@ -2,7 +2,6 @@ import './App.css'
 import { Heatmap } from './Heatmap'
 import useWindowDimensions from './useWindowDimensions'
 import React from 'react'
-import { csv } from 'd3'
 import 'bootstrap/dist/css/bootstrap.css'
 import { Typeahead } from 'react-bootstrap-typeahead'
 import Container from 'react-bootstrap/Container'
@@ -10,9 +9,9 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
-import { Stock, Option } from './types'
-import { initTicker, initStockData, initOption, initChartData } from './init/init'
-import { getStockInfo, capitalize, stringifyMetric, fetchOptionData } from './utils'
+import { initTicker, initStockData, initData, initChartData } from './init/init'
+import { capitalize, stringifyMetric, fetchOptionData } from './utils'
+import { Option } from './types'
 
 const App = (): JSX.Element => {
   // send initial request to API with defaults
@@ -21,7 +20,7 @@ const App = (): JSX.Element => {
   }, [])
 
   // initialize states
-  const [options, setOptions] = React.useState([initOption])
+  const [data, setData] = React.useState(initData)
   const [direction, setDirection] = React.useState('call')
   const [metric, setMetric] = React.useState('volume')
   const [changeType, setChangeType] = React.useState('ticker')
@@ -38,8 +37,7 @@ const App = (): JSX.Element => {
     setChangeType('ticker')
 
     const data = await fetchOptionData(initTicker);
-    // TODO: format API data so that it matches the `option` interface
-    // setOptions(data)
+    setData(data)
 
     // parse stock info from API response
     const stockInfo = {
@@ -52,8 +50,6 @@ const App = (): JSX.Element => {
 
     console.log('Loaded data from API.')
   }
-
-
 
   const changeDirection = (direction: string | null): void => {
     console.log(`direction: ${direction}`)
@@ -80,19 +76,18 @@ const App = (): JSX.Element => {
   const changeChartData = (): void => {
     console.log('filtering options for selected metric and direction')
     const metricStr = stringifyMetric(metric)
-    const chartData = options
-      // filter for calls or puts
-      .filter((option) => option.direction === direction)
-      // select relevent metric and format values for display
-      .map((option) => ({
+    const chartData = data.options
+      // select chosen direction + metric and format values for display
+      .flatMap((chain: any) => chain[`${direction}s`])
+      .map((option: Option) => ({
         symbol: option.symbol,
-        strike: `$${option.strike.replace(/.0$/, '')}`,
+        strike: `$${option.strike}`,
         date_str: option.date_str,
         value: option[metric as keyof typeof option],
-        tooltipContent: `<b>strike: </b>$${option.strike.replace(/.0$/, '')}<br>
+        tooltipContent: `<b>strike: </b>$${option.strike}<br>
                         <b>date: </b>${option.date_str}<br>
-                        <b>${metricStr.toLowerCase()}: </b>${option[metric as keyof typeof option].replace(/.0$/, '')}`
-      }))
+                        <b>${metricStr.toLowerCase()}: </b>${option[metric as keyof typeof option]}`
+      })).reverse();
     console.log('setting chart data')
     setChartData(chartData)
   }
@@ -113,7 +108,7 @@ const App = (): JSX.Element => {
               {/* <Typeahead
                 defaultSelected={[initTicker]}
                 onChange={(t) => {
-                  t[0] ? changeTicker(t[0] as string) : console.log('ticker: [empty]')
+                  t[0] ? loadNewStock(t[0] as string) : console.log('ticker: [empty]')
                 }}
                 emptyLabel='Ticker not found.'
                 highlightOnlyResult={false}
@@ -163,6 +158,8 @@ const App = (): JSX.Element => {
               metric_str={stringifyMetric(metric)}
               direction={direction}
               data={chartData}
+              dates={data.expirationDatesStringified}
+              strikes={data.strikes}
               dims={useWindowDimensions()}
               changeType={changeType}
             />

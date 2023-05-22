@@ -27,6 +27,18 @@ export const initOption: Option = {
   phi: ''
 }
 
+export const initData = {
+  ticker: 'SNDL',
+  description: 'Sundial Growers Inc',
+  price: '0.8',
+  change_percentage: '+0.1',
+  expirationDates: ['2022-04-29'],
+  expirationDatesStringified: ['Apr 29'],
+  strikes: ['3.5'],
+  updated_at: '2021-04-29',
+  options: [{calls: [initOption], puts: [initOption]}]
+}
+
 export const initChartData = {
   symbol: 'SNDL220429C00010000',
   strike: '3.5',

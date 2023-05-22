@@ -16,6 +16,6 @@ export async function fetchQuote(ticker: string): Promise<QuoteSummary> {
     ticker: quote.symbol,
     description: quote.description,
     price: Number(((quote.ask + quote.bid)/2).toFixed(2)).toString(),
-    change_percentage: quote.change_percentage.toString()
+    change_percentage: quote.change_percentage >= 0 ? `+${quote.change_percentage}` : `${quote.change_percentage}`
   };
 }

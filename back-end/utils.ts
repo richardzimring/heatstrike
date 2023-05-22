@@ -33,6 +33,6 @@ export function EmptyOption(ticker, direction, date, date_str, strike): Option {
     vega: '',
     rho: '',
     phi: '',
-  }
+  };
 };
   

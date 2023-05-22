@@ -4,7 +4,7 @@ import { HeatmapData } from './types'
 import { capitalize } from './utils'
 
 export const Heatmap = (props: HeatmapData): JSX.Element => {
-  const { stockData, metric_str, direction, data, dims, changeType } = props
+  const { stockData, metric_str, direction, data, dates, strikes, dims, changeType } = props
   const { ticker, description, price, change_percentage } = stockData
 
   // redraw chart if the data or window dimensions change
@@ -42,11 +42,6 @@ export const Heatmap = (props: HeatmapData): JSX.Element => {
       d3.select('#container')
         .select('.tooltip')
         .remove()
-
-      // get unique dates and strikes
-      // TODO: use values from API instead
-      const dates: string[] = [...new Set(data.map(d => d.date_str))]
-      const strikes: string[] = [...new Set(data.map(d => d.strike))].reverse()
 
       const Dimensions = {
         width: 0.75 * dims.width,
@@ -192,6 +187,13 @@ export const Heatmap = (props: HeatmapData): JSX.Element => {
         xPad = Dimensions.pad * (x.bandwidth() - y.bandwidth())
         yPad = 0
       }
+
+      // print to console if x(d.date_str) is undefined
+      data.filter(d => d.value !== '').forEach( (d) => {
+            if (y(d.strike) === undefined) {
+              console.log(`x(${d.strike}) is undefined`);
+            }
+          });
 
       // draw rectangles
       svg.selectAll()

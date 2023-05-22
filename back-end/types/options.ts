@@ -68,8 +68,13 @@ export interface Option {
   phi: string
 }
 
+export interface OptionChain {
+  calls: Option[];
+  puts: Option[];
+}
+
 export interface OptionChainSummary {
   strikes: string[];
   updated_at: string;
-  options: Option[];
+  options: OptionChain[];
 }
