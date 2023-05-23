@@ -1,4 +1,4 @@
-import { GetDataResponse, Option, Stock } from './types'
+import { GetDataResponse, Stock } from './types'
 import axios from 'axios';
 
 const emptyDataResponse = (ticker: string, description: string): GetDataResponse => {
