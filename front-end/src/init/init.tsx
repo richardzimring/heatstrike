@@ -3,18 +3,18 @@ import { Stock, Option } from '../types'
 export const initTicker = 'AAPL'
 
 export const initStockData: Stock = {
-  ticker: '?',
-  description: '?',
-  price: '?',
-  change_percentage: '+?'
+  ticker: '',
+  description: '',
+  price: '',
+  change_percentage: ''
 }
 
 export const initOption: Option = {
-  symbol: 'SNDL220429C00010000',
+  symbol: '',
   direction: 'call',
-  date: '2022-04-29',
-  date_str: 'Apr 29',
-  strike: '3.5',
+  date: '',
+  date_str: '',
+  strike: '',
   volume: '',
   open_interest: '',
   price: '',
@@ -28,21 +28,21 @@ export const initOption: Option = {
 }
 
 export const initData = {
-  ticker: 'SNDL',
-  description: 'Sundial Growers Inc',
-  price: '0.8',
-  change_percentage: '+0.1',
-  expirationDates: ['2022-04-29'],
-  expirationDatesStringified: ['Apr 29'],
-  strikes: ['3.5'],
-  updated_at: '2021-04-29',
+  ticker: '',
+  description: '',
+  price: '',
+  change_percentage: '',
+  expirationDates: [''],
+  expirationDatesStringified: [''],
+  strikes: [''],
+  updated_at: '',
   options: [{calls: [initOption], puts: [initOption]}]
 }
 
 export const initChartData = {
-  symbol: 'SNDL220429C00010000',
-  strike: '3.5',
-  date_str: 'Apr 29',
-  value: '2000',
+  symbol: '',
+  strike: '',
+  date_str: '',
+  value: '',
   tooltipContent: 'tooltipContent'
 }

@@ -13,6 +13,11 @@ export const Heatmap = (props: HeatmapData): JSX.Element => {
   }, [data, dims])
 
   function drawChart () {
+    // if page still loading, do nothing
+    if (ticker === '') {
+      return;
+    }
+
     // color mapping
     const [min, max] = d3.extent(data, o => parseFloat(o.value)) as number[]
     const color = (direction === 'call') ? 'darkgreen' : 'darkred'
@@ -92,7 +97,7 @@ export const Heatmap = (props: HeatmapData): JSX.Element => {
 
       // "Last Updated" label
       svg.append('text')
-        .text('Data updates every 15 minutes during regular trading hours.')
+        .text('Data updates every 60 minutes during regular trading hours.')
         .attr('x', Dimensions.width - Margin.right)
         .attr('y', 0.99 * Dimensions.height)
         .attr('fill', 'gray')

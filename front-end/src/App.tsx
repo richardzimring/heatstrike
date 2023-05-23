@@ -32,7 +32,6 @@ const App = (): JSX.Element => {
     changeChartData()
   }, [stockInfo, direction, metric])
 
-  // TODO: handle invalid tickers
   const loadNewStock = async (ticker: string): Promise<void> => {
     console.log(`ticker: ${ticker}`)
     const newData = await fetchOptionData(ticker);
@@ -71,9 +70,7 @@ const App = (): JSX.Element => {
 
   const changeMetric = (metric: string | null): void => {
     console.log(`metric: ${metric}`)
-    if (metric === null) {
-      console.log('cannot change metric to `null`')
-    } else {
+    if (metric != null) {
       setChangeType('metric')
       setMetric(metric)
     }
