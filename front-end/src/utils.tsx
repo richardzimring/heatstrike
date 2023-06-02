@@ -24,14 +24,8 @@ export const fetchOptionData = async (ticker: string): Promise<GetDataResponse> 
     return responseData;
   }
   catch (error: any) {
-    if (error.response.data.message === 'Invalid ticker') {
-      console.log(`Invalid ticker: ${ticker}.`)
-      return emptyDataResponse(ticker, 'Invalid ticker')
-    }
-    else {
-      console.log(`Error fetching data for ${ticker}.`)
-      return emptyDataResponse(ticker, 'Error fetching data')
-    }
+    console.log(`Error fetching data for ${ticker}.`)
+    return emptyDataResponse(ticker, 'Error fetching data')
   }
 }
 

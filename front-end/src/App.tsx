@@ -36,8 +36,9 @@ const App = (): JSX.Element => {
     console.log(`ticker: ${ticker}`)
     const newData = await fetchOptionData(ticker);
 
-    // check if API returned an error
-    if (newData.options.length === 0) {
+    // check if API returned an error message
+    if (newData.message) {
+      console.log(`Invalid ticker: ${ticker}.`)
       // reset ticker to previous value
       setTickerEntered(stockInfo.ticker)
     }

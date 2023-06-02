@@ -62,4 +62,5 @@ export interface GetDataResponse {
   expirationDatesStringified: string[];
   strikes: string[];
   options: OptionChain[];
+  message?: string;
 }
