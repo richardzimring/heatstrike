@@ -31,7 +31,7 @@ app.get("/data/:ticker", async function (req, res) {
   );
 
   // if data exists in dynamoDB and date is within the last hour, return cached data
-  if (Item && new Date(Item.updated_at).getTime() > Date.now() - 1000 * 60 * 60) {
+  if (Item && new Date(Item.updated_at).getTime() - 1000*60*60*5 > Date.now() - 1000 * 60 * 60) {
     console.log("using data from dynamoDB cache")
     res.json(Item);
     return;
@@ -76,7 +76,7 @@ app.get("/data/:ticker", async function (req, res) {
   } catch (error) {
     const errorResponse = {
       ticker: ticker,
-      updated_at: new Date().toISOString(),
+      updated_at: new Date(Date.now() + 1000*60*60*5).toISOString(),
       message: error.message
     };
 

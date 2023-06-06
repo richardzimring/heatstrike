@@ -6,7 +6,8 @@ export const initStockData: Stock = {
   ticker: '',
   description: '',
   price: '',
-  change_percentage: ''
+  change_percentage: '',
+  updated_at: ''
 }
 
 export const initOption: Option = {

@@ -51,7 +51,8 @@ const App = (): JSX.Element => {
         ticker: newData.ticker,
         description: newData.description,
         price: newData.price,
-        change_percentage: newData.change_percentage
+        change_percentage: newData.change_percentage,
+        updated_at: newData.updated_at
       };
 
       setStockInfo(stockInfo)

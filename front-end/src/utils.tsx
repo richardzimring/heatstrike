@@ -37,7 +37,8 @@ export const getStockInfo = (stocks: Stock[], ticker: string): Stock => {
       ticker: ticker,
       description: 'Stock info not found in database.',
       price: '?',
-      change_percentage: '+?'
+      change_percentage: '+?',
+      updated_at: '?'
     }
   }
   return stock

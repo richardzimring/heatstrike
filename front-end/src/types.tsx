@@ -3,6 +3,7 @@ export interface Stock {
   description: string
   price: string
   change_percentage: string
+  updated_at: string
 }
 
 export interface ChartData {

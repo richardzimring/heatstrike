@@ -5,7 +5,7 @@ import { capitalize } from './utils'
 
 export const Heatmap = (props: HeatmapData): JSX.Element => {
   const { stockData, metric_str, direction, data, dates, strikes, dims, changeType } = props
-  const { ticker, description, price, change_percentage } = stockData
+  const { ticker, description, price, change_percentage, updated_at } = stockData
 
   // redraw chart if the data or window dimensions change
   React.useEffect(() => {
@@ -95,9 +95,32 @@ export const Heatmap = (props: HeatmapData): JSX.Element => {
         .attr('fill', 'lightgray')
         .style('font-size', '0.53em')
 
+      const currentTime = Date.now()
+      // time zone is 5 hours ahead
+      const updatedTime = new Date(updated_at).getTime() - 1000*60*60*5
+      const timeDifSeconds = Math.floor((currentTime - updatedTime) / 1000)
+      const timeDifMinutes = Math.floor(timeDifSeconds / 60)
+      const timeDifHours = Math.floor(timeDifMinutes / 60)
+      const timeDifDays = Math.floor(timeDifHours / 24)
+
+      let timeDifString, plural
+      if (timeDifDays > 0) {
+        plural = (timeDifDays > 1) ? 's' : ''
+        timeDifString = `${timeDifDays} day${plural}`
+      } else if (timeDifHours > 0) {
+        plural = (timeDifHours > 1) ? 's' : ''
+        timeDifString = `${timeDifHours} hour${plural}`
+      } else if (timeDifMinutes > 0) {
+        plural = (timeDifMinutes > 1) ? 's' : ''
+        timeDifString = `${timeDifMinutes} minute${plural}`
+      } else {
+        plural = (timeDifSeconds > 1) ? 's' : ''
+        timeDifString = `${timeDifSeconds} second${plural}`
+      }
+
       // "Last Updated" label
       svg.append('text')
-        .text('Data updates every 60 minutes during regular trading hours.')
+        .text(`Updated ~${timeDifString} ago. Data updates every 60 minutes during regular trading hours.`)
         .attr('x', Dimensions.width - Margin.right)
         .attr('y', 0.99 * Dimensions.height)
         .attr('fill', 'gray')
