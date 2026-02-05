@@ -1,0 +1,55 @@
+org: rgzimring
+app: heatmap
+service: heatmap
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+  region: us-east-2
+  stage: ${opt:stage, 'dev'}
+  logRetentionInDays: 7
+  versionFunctions: false
+  environment:
+    OPTIONS_TABLE_NAME:
+      Ref: OptionsTable
+    TRADIER_KEY: ${ssm:tradier-api-key}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+          Resource:
+            - Fn::GetAtt: [OptionsTable, Arn]
+
+functions:
+  OptionsAPI:
+    handler: lambdas/api.handler
+    name: ${self:provider.stage}-${self:service}-options-api
+    memorySize: 256
+    timeout: 29
+    events:
+      - httpApi:
+          path: /data/{ticker}
+          method: GET
+      - httpApi:
+          path: /openapi.json
+          method: GET
+
+resources:
+  Resources:
+    OptionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: ticker
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ticker
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.stage}-${self:service}-options-table

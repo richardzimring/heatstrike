@@ -1,0 +1,84 @@
+{
+  "compilerOptions": {
+    "target": "es2024",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    // Output directory for compiled JavaScript
+    "outDir": "dist",
+    "rootDir": ".",
+
+    // Strict type checking options
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Additional strict checks (relaxed for DynamoDB Record types)
+    "exactOptionalPropertyTypes": false,
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Module resolution and interop
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+
+    // // Source maps for debugging (disable for production builds)
+    // "sourceMap": true,
+    // "inlineSourceMap": false,
+    // "inlineSources": false,
+
+    // Skip type checking of declaration files
+    "skipLibCheck": true,
+
+    // Emit options
+    "declaration": false,
+    "declarationMap": false,
+    "preserveConstEnums": true,
+    "removeComments": true,
+
+    // Advanced options
+    "isolatedModules": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "noEmitOnError": true,
+
+    // For compatibility with bundlers like esbuild
+    "useDefineForClassFields": true,
+
+    // Library files
+    "lib": [
+      "es2024",
+      "ESNext.Array",
+      "ESNext.Collection",
+      "ESNext.Iterator",
+      "ESNext.Promise"
+    ],
+
+    // Type definitions
+    "types": ["node"]
+
+    // // Path mapping (useful for Lambda layers or shared code)
+    // "baseUrl": "./",
+    // "paths": {
+    //   "@/*": ["src/*"],
+    //   "@shared/*": ["src/shared/*"],
+    //   "@utils/*": ["src/utils/*"]
+    // }
+  },
+
+  // Include patterns
+  "include": ["src/**/*", "lambdas/**/*", "scripts/**/*"],
+
+  // Exclude patterns
+  "exclude": ["node_modules", ".vscode", "dist", "**/*.test.ts", "**/*.d.ts"]
+}

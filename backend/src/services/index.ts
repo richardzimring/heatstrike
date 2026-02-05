@@ -1,0 +1,1 @@
+export { getOptionsData } from './optionsService';

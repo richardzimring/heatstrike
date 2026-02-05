@@ -1,0 +1,32 @@
+{
+  "name": "heatmap-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "serverless offline",
+    "deploy": "serverless deploy --stage dev",
+    "lint": "npx eslint . && tsc --noEmit",
+    "lint:fix": "npx eslint . --fix",
+    "format": "npx prettier --write \"lambdas/**/*.{ts,json}\" \"src/**/*.{ts,json}\"",
+    "check": "npx prettier --check \"lambdas/**/*.{ts,json}\" \"src/**/*.{ts,json}\"",
+    "generate:openapi": "tsx --env-file=.env scripts/generate-openapi.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.983.0",
+    "@aws-sdk/lib-dynamodb": "^3.983.0",
+    "@hono/zod-openapi": "^0.19.6",
+    "hono": "^4.7.4",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/node": "^24.10.10",
+    "eslint": "^9.21.0",
+    "prettier": "^3.5.2",
+    "serverless": "^4.7.5",
+    "serverless-offline": "^14.4.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.29.0"
+  }
+}
