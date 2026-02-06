@@ -1,5 +1,6 @@
 import { Github } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { BugReportDialog } from './BugReportDialog';
 import { Button } from '@/components/ui/button';
 import { TickerInput } from '@/components/controls/TickerInput';
 
@@ -35,6 +36,7 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-2">
+          <ThemeToggle />
           <Button variant="ghost" size="icon" asChild>
             <a
               href="https://github.com/richardzimring/heatmap"
@@ -45,7 +47,7 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
               <Github className="h-5 w-5" />
             </a>
           </Button>
-          <ThemeToggle />
+          <BugReportDialog />
         </div>
       </div>
     </header>
