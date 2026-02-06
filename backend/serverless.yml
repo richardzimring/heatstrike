@@ -17,6 +17,8 @@ provider:
   environment:
     OPTIONS_TABLE_NAME:
       Ref: OptionsTable
+    TICKERS_BUCKET_NAME:
+      Ref: TickersBucket
     TRADIER_KEY: ${ssm:tradier-api-key}
     BUG_REPORT_EMAIL: ${ssm:bug-report-email}
   iam:
@@ -32,6 +34,15 @@ provider:
           Action:
             - ses:SendEmail
           Resource: '*'
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+          Resource:
+            - Fn::Join:
+                - ''
+                - - Fn::GetAtt: [TickersBucket, Arn]
+                  - '/*'
 
 functions:
   OptionsAPI:
@@ -49,6 +60,17 @@ functions:
       - httpApi:
           path: /bug-report
           method: POST
+      - httpApi:
+          path: /tickers
+          method: GET
+
+  RefreshTickers:
+    handler: lambdas/refreshTickers.handler
+    name: ${self:provider.stage}-${self:service}-refresh-tickers
+    memorySize: 256
+    timeout: 30
+    events:
+      - schedule: rate(1 day)
 
 resources:
   Resources:
@@ -63,3 +85,8 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.stage}-${self:service}-options-table
+
+    TickersBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.stage}-${self:service}-tickers
