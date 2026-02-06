@@ -1,7 +1,7 @@
-import { Github } from "lucide-react";
-import { ThemeToggle } from "./ThemeToggle";
-import { Button } from "@/components/ui/button";
-import { TickerInput } from "@/components/controls/TickerInput";
+import { Github } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
+import { Button } from '@/components/ui/button';
+import { TickerInput } from '@/components/controls/TickerInput';
 
 interface HeaderProps {
   ticker: string;

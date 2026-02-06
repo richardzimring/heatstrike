@@ -1,7 +1,7 @@
-import { useState, useEffect, type KeyboardEvent } from "react";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useEffect, type KeyboardEvent } from 'react';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface TickerInputProps {
   value: string;
@@ -24,7 +24,7 @@ export function TickerInput({
   }, [value]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       const trimmed = inputValue.trim().toUpperCase();
       if (trimmed && trimmed !== value) {
         onChange(trimmed);
@@ -39,7 +39,7 @@ export function TickerInput({
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         type="text"

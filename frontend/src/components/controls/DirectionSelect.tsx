@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
   SelectGroup,
-  SelectLabel
+  SelectLabel,
 } from '@/components/ui/select';
 import { DIRECTION_OPTIONS, type Direction } from '@/types';
 

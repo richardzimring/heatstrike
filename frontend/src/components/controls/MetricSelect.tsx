@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
   SelectGroup,
-  SelectLabel
+  SelectLabel,
 } from '@/components/ui/select';
 import { METRIC_OPTIONS, type Metric } from '@/types';
 
@@ -25,8 +25,8 @@ export function MetricSelect({ value, onChange }: MetricSelectProps) {
           <SelectLabel>Metric</SelectLabel>
           <SelectGroup>
             {METRIC_OPTIONS.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
               </SelectItem>
             ))}
           </SelectGroup>

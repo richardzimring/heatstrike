@@ -24,7 +24,9 @@ function LoadingState() {
       <CardContent className="flex h-[500px] items-center justify-center p-6">
         <div className="flex flex-col items-center gap-3">
           <Spinner className="size-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">Loading options data...</p>
+          <p className="text-sm text-muted-foreground">
+            Loading options data...
+          </p>
         </div>
       </CardContent>
     </Card>
@@ -48,20 +50,22 @@ function EmptyState() {
   return (
     <Card className="border-border">
       <CardContent className="flex h-[500px] items-center justify-center p-6">
-        <p className="text-muted-foreground text-sm">Enter a ticker to view options data</p>
+        <p className="text-muted-foreground text-sm">
+          Enter a ticker to view options data
+        </p>
       </CardContent>
     </Card>
   );
 }
 
-export function HeatmapCard({ 
-  data, 
-  direction, 
-  metric, 
-  setDirection, 
-  setMetric, 
-  isLoading, 
-  error 
+export function HeatmapCard({
+  data,
+  direction,
+  metric,
+  setDirection,
+  setMetric,
+  isLoading,
+  error,
 }: HeatmapCardProps) {
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorState message={error.message} />;
@@ -84,19 +88,25 @@ export function HeatmapCard({
           </h2>
           <div className="flex items-baseline gap-2 mt-1">
             <span className="text-3xl font-normal">${data.price}</span>
-            <div className={`flex items-center gap-1 text-base font-medium ${
-              isPositiveChange ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
-            }`}>
+            <div
+              className={`flex items-center gap-1 text-base font-medium ${
+                isPositiveChange
+                  ? 'text-green-600 dark:text-green-500'
+                  : 'text-red-600 dark:text-red-500'
+              }`}
+            >
               <TrendIcon className="h-4 w-4" />
-              <span>{data.change} ({data.change_percentage}%)</span>
+              <span>
+                {data.change} ({data.change_percentage}%)
+              </span>
             </div>
           </div>
         </div>
-        
+
         {/* Right side - Controls */}
         <div className="flex items-center gap-2 self-end">
-            <DirectionSelect value={direction} onChange={setDirection} />
-            <MetricSelect value={metric} onChange={setMetric} />
+          <DirectionSelect value={direction} onChange={setDirection} />
+          <MetricSelect value={metric} onChange={setMetric} />
         </div>
       </div>
 
@@ -118,7 +128,7 @@ export function HeatmapCard({
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Updated time footnote */}
       <div className="text-xs text-muted-foreground text-right">
         Updated {formatRelativeTime(data.updated_at)}
