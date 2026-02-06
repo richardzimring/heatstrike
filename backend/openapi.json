@@ -1,0 +1,514 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Options Heatmap API",
+    "description": "API for fetching stock options chain data for heatmap visualization"
+  },
+  "servers": [
+    {
+      "url": "https://vk3egx5xz0.execute-api.us-east-2.amazonaws.com",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "OptionsDataResponse": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "example": "AAPL"
+          },
+          "description": {
+            "type": "string",
+            "example": "Apple Inc"
+          },
+          "price": {
+            "type": "string",
+            "example": "185.50"
+          },
+          "change": {
+            "type": "string",
+            "example": "+2.50"
+          },
+          "change_percentage": {
+            "type": "string",
+            "example": "+1.25"
+          },
+          "expirationDates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "2024-01-19",
+              "2024-01-26",
+              "2024-02-02"
+            ]
+          },
+          "expirationDatesStringified": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Jan 19",
+              "Jan 26",
+              "Feb 2"
+            ]
+          },
+          "strikes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "$180",
+              "$181",
+              "$182",
+              "$183",
+              "$184",
+              "$185"
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T14:30:00.000Z"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "calls": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "symbol": {
+                        "type": "string",
+                        "example": "AAPL"
+                      },
+                      "direction": {
+                        "type": "string",
+                        "example": "call"
+                      },
+                      "date": {
+                        "type": "string",
+                        "example": "2024-01-19"
+                      },
+                      "date_str": {
+                        "type": "string",
+                        "example": "Jan 19"
+                      },
+                      "strike": {
+                        "type": "string",
+                        "example": "185"
+                      },
+                      "volume": {
+                        "type": "string",
+                        "example": "1234"
+                      },
+                      "open_interest": {
+                        "type": "string",
+                        "example": "5678"
+                      },
+                      "price": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "3.45"
+                      },
+                      "spread": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.05"
+                      },
+                      "delta": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.523456"
+                      },
+                      "gamma": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.045678"
+                      },
+                      "theta": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "-0.012345"
+                      },
+                      "vega": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.234567"
+                      },
+                      "rho": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.056789"
+                      },
+                      "phi": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "-0.034567"
+                      }
+                    },
+                    "required": [
+                      "symbol",
+                      "direction",
+                      "date",
+                      "date_str",
+                      "strike",
+                      "volume",
+                      "open_interest",
+                      "price",
+                      "spread",
+                      "delta",
+                      "gamma",
+                      "theta",
+                      "vega",
+                      "rho",
+                      "phi"
+                    ]
+                  }
+                },
+                "puts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "symbol": {
+                        "type": "string",
+                        "example": "AAPL"
+                      },
+                      "direction": {
+                        "type": "string",
+                        "example": "call"
+                      },
+                      "date": {
+                        "type": "string",
+                        "example": "2024-01-19"
+                      },
+                      "date_str": {
+                        "type": "string",
+                        "example": "Jan 19"
+                      },
+                      "strike": {
+                        "type": "string",
+                        "example": "185"
+                      },
+                      "volume": {
+                        "type": "string",
+                        "example": "1234"
+                      },
+                      "open_interest": {
+                        "type": "string",
+                        "example": "5678"
+                      },
+                      "price": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "3.45"
+                      },
+                      "spread": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.05"
+                      },
+                      "delta": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.523456"
+                      },
+                      "gamma": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.045678"
+                      },
+                      "theta": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "-0.012345"
+                      },
+                      "vega": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.234567"
+                      },
+                      "rho": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.056789"
+                      },
+                      "phi": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "-0.034567"
+                      }
+                    },
+                    "required": [
+                      "symbol",
+                      "direction",
+                      "date",
+                      "date_str",
+                      "strike",
+                      "volume",
+                      "open_interest",
+                      "price",
+                      "spread",
+                      "delta",
+                      "gamma",
+                      "theta",
+                      "vega",
+                      "rho",
+                      "phi"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "calls",
+                "puts"
+              ]
+            }
+          }
+        },
+        "required": [
+          "ticker",
+          "description",
+          "price",
+          "change",
+          "change_percentage",
+          "expirationDates",
+          "expirationDatesStringified",
+          "strikes",
+          "updated_at",
+          "options"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "example": "INVALID"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T14:30:00.000Z"
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid ticker"
+          }
+        },
+        "required": [
+          "ticker",
+          "updated_at",
+          "message"
+        ]
+      },
+      "BugReportSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Bug report submitted successfully"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "BugReportErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Failed to submit bug report"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "BugReportRequest": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "Description of the bug",
+            "example": "The heatmap does not load for ticker XYZ"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Optional contact email for follow-up",
+            "example": "user@example.com"
+          },
+          "userAgent": {
+            "type": "string",
+            "description": "Browser user agent string",
+            "example": "Mozilla/5.0 ..."
+          }
+        },
+        "required": [
+          "description"
+        ]
+      },
+      "TickerEntry": {
+        "type": "object",
+        "properties": {
+          "t": {
+            "type": "string",
+            "description": "Ticker symbol",
+            "example": "AAPL"
+          },
+          "n": {
+            "type": "string",
+            "description": "Company name",
+            "example": "Apple Inc"
+          }
+        },
+        "required": [
+          "t",
+          "n"
+        ]
+      },
+      "TickersResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/TickerEntry"
+        }
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/data/{ticker}": {
+      "get": {
+        "tags": [
+          "Options"
+        ],
+        "summary": "Get options chain data",
+        "description": "Fetches options chain data for a given stock ticker, including expiration dates, strikes, and Greeks. Data is cached for 1 hour.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 5,
+              "description": "Stock ticker symbol",
+              "example": "AAPL"
+            },
+            "required": true,
+            "name": "ticker",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Options data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OptionsDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ticker or API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bug-report": {
+      "post": {
+        "tags": [
+          "Bug Report"
+        ],
+        "summary": "Submit a bug report",
+        "description": "Sends a bug report email with the provided description and optional contact info.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BugReportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bug report submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BugReportSuccessResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to submit bug report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BugReportErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickers": {
+      "get": {
+        "tags": [
+          "Tickers"
+        ],
+        "summary": "Get all valid tickers",
+        "description": "Returns the full list of valid stock tickers and their company names. Data is refreshed daily from the OCC.",
+        "responses": {
+          "200": {
+            "description": "Tickers list retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TickersResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to load tickers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TickersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

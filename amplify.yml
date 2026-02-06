@@ -6,6 +6,7 @@ applications:
           commands:
             - nvm use 24
             - npm ci
+            - npm run generate:api
         build:
           commands:
             - npm run build
