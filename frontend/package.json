@@ -11,7 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css}\"",
     "check": "prettier --check \"src/**/*.{ts,tsx,json,css}\"",
     "preview": "vite preview",
-    "generate:api": "openapi-ts -i ../backend/openapi.json -o ./src/lib/api/generated -c @hey-api/client-fetch"
+    "generate:api": "openapi-ts -i ../backend/openapi.json -o ./src/lib/api/generated"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.2.6",
@@ -37,7 +37,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@hey-api/client-fetch": "^0.13.1",
     "@hey-api/openapi-ts": "^0.91.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
