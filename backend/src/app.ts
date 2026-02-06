@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import { optionsRouter } from './routes/index';
+import { optionsRouter, bugReportRouter } from './routes/index';
 
 // Create main Hono app with OpenAPI support
 export const app = new OpenAPIHono();
@@ -12,6 +12,7 @@ app.use('*', logger());
 
 // Mount routes
 app.route('/', optionsRouter);
+app.route('/', bugReportRouter);
 
 // 404 handler
 app.notFound((c) => {
