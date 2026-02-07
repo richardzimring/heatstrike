@@ -1,6 +1,7 @@
 import { ParentSize } from '@visx/responsive';
 import { Heatmap } from './Heatmap';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { formatRelativeTime } from '@/lib/utils';
 import type { OptionsDataResponse, Direction, Metric } from '@/types';
@@ -20,16 +21,46 @@ interface HeatmapCardProps {
 
 function LoadingState() {
   return (
-    <Card className="border-border">
-      <CardContent className="flex h-[500px] items-center justify-center p-6">
-        <div className="flex flex-col items-center gap-3">
-          <Spinner className="size-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            Loading options data...
-          </p>
+    <div className="flex flex-col flex-1 gap-4 min-h-0">
+      {/* Header skeleton - matches loaded header layout */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 shrink-0">
+        {/* Left side - Stock info skeleton */}
+        <div className="flex flex-col gap-1">
+          {/* Ticker */}
+          <Skeleton className="h-4 w-12 rounded" />
+          {/* Description */}
+          <Skeleton className="h-8 w-48 rounded" />
+          {/* Price + change row */}
+          <div className="flex items-baseline gap-2 mt-1">
+            <Skeleton className="h-8 w-28 rounded" />
+            <Skeleton className="h-5 w-32 rounded" />
+          </div>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Right side - Controls skeleton */}
+        <div className="flex gap-2 w-full sm:w-auto sm:self-end">
+          <Skeleton className="h-9 w-[120px] rounded-md" />
+          <Skeleton className="h-9 w-[120px] rounded-md" />
+        </div>
+      </div>
+
+      {/* Card with spinner */}
+      <Card className="border-border flex-1 flex flex-col min-h-0">
+        <CardContent className="flex flex-1 items-center justify-center p-6 min-h-[300px]">
+          <div className="flex flex-col items-center gap-3">
+            <Spinner className="size-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              Loading options data...
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Updated time footnote skeleton */}
+      <div className="flex justify-end shrink-0">
+        <Skeleton className="h-4 w-36 rounded" />
+      </div>
+    </div>
   );
 }
 
