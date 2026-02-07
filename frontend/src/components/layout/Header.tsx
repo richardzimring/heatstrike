@@ -39,7 +39,7 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
           <ThemeToggle />
           <Button variant="ghost" size="icon" asChild>
             <a
-              href="https://github.com/richardzimring/heatmap"
+              href="https://github.com/richardzimring/heatstrike"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"

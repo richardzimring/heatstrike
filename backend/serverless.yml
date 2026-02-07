@@ -1,6 +1,6 @@
 org: rgzimring
-app: heatmap
-service: heatmap
+app: heatstrike
+service: heatstrike
 
 plugins:
   - serverless-offline

@@ -14,6 +14,7 @@ alwaysApply: false
 - @visx for data visualization (heatmap)
 - Hey API (`@hey-api/openapi-ts`) for generated API client
 - next-themes for dark/light mode
+- GitHub Actions + Pages for deployment and hosting
 
 ## Project Structure
 

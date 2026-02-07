@@ -37,7 +37,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: https://vk3egx5xz0.execute-api.us-east-2.amazonaws.com
+          VITE_API_URL: https://bcwqcc975a.execute-api.us-east-2.amazonaws.com
 
       - uses: actions/upload-pages-artifact@v3
         with:
