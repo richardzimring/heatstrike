@@ -169,8 +169,8 @@ export function TickerInput({
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder="Search ticker or company..."
-        className="pl-9 h-9 w-[200px] bg-muted/50 focus:bg-background transition-colors border"
+        placeholder="Search ticker..."
+        className="pl-9 h-9 w-[200px] bg-muted/50 focus:bg-background transition-colors border text-base sm:text-sm"
         disabled={isLoading}
         autoComplete="off"
         role="combobox"
