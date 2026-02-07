@@ -1,12 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getTickers } from '@/lib/api/generated';
-import { client } from '@/lib/api/generated/client.gen';
 import type { TickersResponse } from '@/lib/api/generated';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-// Ensure the client is configured (same pattern as useOptionsData)
-client.setConfig({ baseUrl: API_BASE_URL });
 
 async function fetchTickers(): Promise<TickersResponse> {
   const { data, error } = await getTickers();

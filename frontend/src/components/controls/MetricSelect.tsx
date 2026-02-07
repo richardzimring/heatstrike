@@ -23,13 +23,11 @@ export function MetricSelect({ value, onChange }: MetricSelectProps) {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Metric</SelectLabel>
-          <SelectGroup>
-            {METRIC_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectGroup>
+          {METRIC_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>

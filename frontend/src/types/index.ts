@@ -1,4 +1,3 @@
-// Re-export API types from generated client
 import type { OptionsDataResponse } from '@/lib/api/generated';
 export type { OptionsDataResponse };
 

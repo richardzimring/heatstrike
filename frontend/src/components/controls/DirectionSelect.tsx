@@ -23,13 +23,11 @@ export function DirectionSelect({ value, onChange }: DirectionSelectProps) {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Direction</SelectLabel>
-          <SelectGroup>
-            {DIRECTION_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectGroup>
+          {DIRECTION_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>

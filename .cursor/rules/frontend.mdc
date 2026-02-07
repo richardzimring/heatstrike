@@ -74,7 +74,7 @@ App types are derived from the generated API types — see `types/index.ts`. Use
 
 ## After Making Changes
 
-- Run `npm run lint` from `frontend/`
+- Run `npm run lint` from `frontend/` **in the terminal** (not the IDE's inline linter — it only shows ESLint errors, not TypeScript type errors). This runs both ESLint and `tsc`.
 - If you changed how the frontend calls the API (e.g., new endpoints), run `npm run generate:api` to regenerate the client from the backend's `openapi.json`
 - Do not run the dev server
 - Do not write or run tests

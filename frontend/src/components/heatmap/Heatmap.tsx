@@ -4,11 +4,11 @@ import { Group } from '@visx/group';
 import { scaleLinear, scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import type { OptionsDataResponse, Direction, Metric, Option } from '@/types';
 
 const MARGIN_DESKTOP = { top: 10, right: 20, bottom: 55, left: 70 };
 const MARGIN_MOBILE = { top: 4, right: 4, bottom: 4, left: 4 };
-const MOBILE_BREAKPOINT = 500;
 
 interface HeatmapProps {
   data: OptionsDataResponse;
@@ -75,6 +75,7 @@ export function Heatmap({
   height,
 }: HeatmapProps) {
   const { resolvedTheme } = useTheme();
+  const isMobile = useIsMobile();
   const {
     tooltipOpen,
     tooltipLeft,
@@ -84,7 +85,6 @@ export function Heatmap({
     showTooltip,
   } = useTooltip<CellData>();
 
-  const isMobile = width < MOBILE_BREAKPOINT;
   const MARGIN = isMobile ? MARGIN_MOBILE : MARGIN_DESKTOP;
 
   const { cells, maxValue } = useMemo(
@@ -143,13 +143,6 @@ export function Heatmap({
   const [activeCellKey, setActiveCellKey] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Clean up debounced hide on unmount
-  useEffect(() => {
-    return () => {
-      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
-    };
-  }, []);
 
   // Dismiss tooltip when tapping anywhere outside the heatmap container
   useEffect(() => {

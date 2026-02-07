@@ -7,6 +7,7 @@
     "deploy": "serverless deploy --stage dev",
     "lint": "npx eslint . && tsc --noEmit",
     "lint:fix": "npx eslint . --fix",
+    "typecheck": "tsc --noEmit",
     "format": "npx prettier --write \"lambdas/**/*.{ts,json}\" \"src/**/*.{ts,json}\"",
     "check": "npx prettier --check \"lambdas/**/*.{ts,json}\" \"src/**/*.{ts,json}\"",
     "generate:openapi": "tsx --env-file=.env scripts/generate-openapi.ts"

@@ -67,6 +67,7 @@ Defined in `serverless.yml`, sourced from SSM Parameter Store in production. Val
 ## Infrastructure
 
 Defined in `serverless.yml` resources section:
+
 - DynamoDB table (PAY_PER_REQUEST, partition key: `ticker`)
 - S3 bucket (ticker list)
 - IAM permissions for DynamoDB, S3, SES
@@ -80,7 +81,7 @@ Defined in `serverless.yml` resources section:
 
 ## After Making Changes
 
-- Run `npm run lint` from `backend/`
+- Run `npm run lint` from `backend/` **in the terminal** (not the IDE's inline linter — it only shows ESLint errors, not TypeScript type errors). This runs both ESLint and `tsc`.
 - If you changed any route interface (params, body, response shape), regenerate the OpenAPI spec: `npm run generate:openapi`
 - The frontend consumes `backend/openapi.json` — after regenerating, the frontend needs `npm run generate:api` to pick up changes
 - Do not write or run tests
