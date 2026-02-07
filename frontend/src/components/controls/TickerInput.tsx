@@ -170,7 +170,7 @@ export function TickerInput({
         onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder="Search ticker or company..."
-        className="pl-9 h-9 w-[250px] bg-muted/50 focus:bg-background transition-colors border"
+        className="pl-9 h-9 w-[200px] bg-muted/50 focus:bg-background transition-colors border"
         disabled={isLoading}
         autoComplete="off"
         role="combobox"

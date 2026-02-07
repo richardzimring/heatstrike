@@ -50,7 +50,12 @@ optionsRouter.openapi(getOptionsRoute, async (c) => {
 
   // Check if response is an error
   if ('message' in result) {
-    return c.json(result, 400);
+    // Log the detailed error for observability, return generic message to client
+    console.error(`Options error for ${ticker}:`, result.message);
+    return c.json(
+      { ...result, message: 'An unexpected error occurred. Please try again.' },
+      400,
+    );
   }
 
   return c.json(result, 200);

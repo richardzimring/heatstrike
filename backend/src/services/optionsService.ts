@@ -137,6 +137,10 @@ export async function getOptionsData(
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
+
+    // Log the actual error for observability
+    console.error(`Error fetching options data for ${ticker}:`, error);
+
     const errorResponse = createErrorResponse(ticker, errorMessage);
 
     // Cache the error response

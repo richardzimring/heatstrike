@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { formatRelativeTime } from '@/lib/utils';
 import type { OptionsDataResponse, Direction, Metric } from '@/types';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { DirectionSelect } from '@/components/controls/DirectionSelect';
 import { MetricSelect } from '@/components/controls/MetricSelect';
 
@@ -33,13 +33,20 @@ function LoadingState() {
   );
 }
 
-function ErrorState({ message }: { message: string }) {
+function ErrorState() {
   return (
     <Card className="border-border">
       <CardContent className="flex h-[500px] items-center justify-center p-6">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <p className="text-destructive font-medium">Error loading data</p>
-          <p className="text-muted-foreground text-sm max-w-md">{message}</p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <AlertCircle className="size-8 text-destructive" />
+          <div className="flex flex-col gap-1">
+            <p className="text-destructive font-medium">
+              Something went wrong
+            </p>
+            <p className="text-muted-foreground text-sm max-w-md">
+              An unexpected error occurred. Please try again.
+            </p>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -68,7 +75,7 @@ export function HeatmapCard({
   error,
 }: HeatmapCardProps) {
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState message={error.message} />;
+  if (error) return <ErrorState />;
   if (!data) return <EmptyState />;
 
   const isPositiveChange = data.change_percentage.startsWith('+');
