@@ -40,9 +40,7 @@ function ErrorState() {
         <div className="flex flex-col items-center gap-3 text-center">
           <AlertCircle className="size-8 text-destructive" />
           <div className="flex flex-col gap-1">
-            <p className="text-destructive font-medium">
-              Something went wrong
-            </p>
+            <p className="text-destructive font-medium">Something went wrong</p>
             <p className="text-muted-foreground text-sm max-w-md">
               An unexpected error occurred. Please try again.
             </p>

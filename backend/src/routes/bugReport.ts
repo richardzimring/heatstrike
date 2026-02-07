@@ -18,7 +18,8 @@ const postBugReportRoute = createRoute({
   path: '/bug-report',
   tags: ['Bug Report'],
   summary: 'Submit a bug report',
-  description: 'Sends a bug report email with the provided description and optional contact info.',
+  description:
+    'Sends a bug report email with the provided description and optional contact info.',
   request: {
     body: {
       content: {

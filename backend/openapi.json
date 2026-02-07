@@ -89,6 +89,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
+                    "nullable": true,
                     "properties": {
                       "symbol": {
                         "type": "string",
@@ -182,6 +183,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
+                    "nullable": true,
                     "properties": {
                       "symbol": {
                         "type": "string",

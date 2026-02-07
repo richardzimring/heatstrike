@@ -2,7 +2,6 @@ import { TRADIER_KEY, TRADIER_BASE_URL, STRIKE_RANGE } from '../constants';
 import { TradierOptionsChainResponseSchema } from '../types/tradier';
 import type { TradierOptionData } from '../types/tradier';
 import type { Option, OptionChain } from '../schemas/options';
-import { createEmptyOption } from '../utils/index';
 
 export interface OptionChainSummary {
   strikes: string[];
@@ -137,16 +136,10 @@ export async function fetchOptionData(
 
     return {
       calls: desiredStrikes.map((strike) => {
-        const existing = optionMap.get(`${strike}-call`);
-        return (
-          existing ?? createEmptyOption(ticker, 'call', date, dateStr, strike)
-        );
+        return optionMap.get(`${strike}-call`) ?? null;
       }),
       puts: desiredStrikes.map((strike) => {
-        const existing = optionMap.get(`${strike}-put`);
-        return (
-          existing ?? createEmptyOption(ticker, 'put', date, dateStr, strike)
-        );
+        return optionMap.get(`${strike}-put`) ?? null;
       }),
     };
   });

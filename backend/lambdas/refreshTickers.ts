@@ -70,7 +70,9 @@ export const handler = async (): Promise<void> => {
 
   const response = await fetch(OCC_URL);
   if (!response.ok) {
-    throw new Error(`OCC API returned ${response.status}: ${response.statusText}`);
+    throw new Error(
+      `OCC API returned ${response.status}: ${response.statusText}`,
+    );
   }
 
   const raw = await response.text();

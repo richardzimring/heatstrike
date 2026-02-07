@@ -41,8 +41,8 @@ export const OptionSchema = z.object({
 });
 
 export const OptionChainSchema = z.object({
-  calls: z.array(OptionSchema),
-  puts: z.array(OptionSchema),
+  calls: z.array(OptionSchema.nullable()),
+  puts: z.array(OptionSchema.nullable()),
 });
 
 export const OptionsDataResponseSchema = z

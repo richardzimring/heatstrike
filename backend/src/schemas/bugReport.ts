@@ -13,21 +13,14 @@ export const BugReportRequestSchema = z
         example: 'The heatmap does not load for ticker XYZ',
         description: 'Description of the bug',
       }),
-    email: z
-      .string()
-      .email('Invalid email address')
-      .optional()
-      .openapi({
-        example: 'user@example.com',
-        description: 'Optional contact email for follow-up',
-      }),
-    userAgent: z
-      .string()
-      .optional()
-      .openapi({
-        example: 'Mozilla/5.0 ...',
-        description: 'Browser user agent string',
-      }),
+    email: z.string().email('Invalid email address').optional().openapi({
+      example: 'user@example.com',
+      description: 'Optional contact email for follow-up',
+    }),
+    userAgent: z.string().optional().openapi({
+      example: 'Mozilla/5.0 ...',
+      description: 'Browser user agent string',
+    }),
   })
   .openapi('BugReportRequest');
 
@@ -36,7 +29,9 @@ export const BugReportRequestSchema = z
  */
 export const BugReportSuccessResponseSchema = z
   .object({
-    message: z.string().openapi({ example: 'Bug report submitted successfully' }),
+    message: z
+      .string()
+      .openapi({ example: 'Bug report submitted successfully' }),
   })
   .openapi('BugReportSuccessResponse');
 
@@ -48,5 +43,9 @@ export const BugReportErrorResponseSchema = z
 
 // Type exports
 export type BugReportRequest = z.infer<typeof BugReportRequestSchema>;
-export type BugReportSuccessResponse = z.infer<typeof BugReportSuccessResponseSchema>;
-export type BugReportErrorResponse = z.infer<typeof BugReportErrorResponseSchema>;
+export type BugReportSuccessResponse = z.infer<
+  typeof BugReportSuccessResponseSchema
+>;
+export type BugReportErrorResponse = z.infer<
+  typeof BugReportErrorResponseSchema
+>;

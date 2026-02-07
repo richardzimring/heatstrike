@@ -22,14 +22,14 @@ interface CellData {
   date: string;
   dateStr: string;
   dateIndex: number;
-  value: number;
-  option: Option;
+  value: number | null; // null = metric unavailable; number = real value (including 0)
+  option: Option | null; // null = option doesn't exist at this grid point
 }
 
-function getMetricValue(option: Option, metric: Metric): number {
-  const value = option[metric];
-  if (!value || value === '') return 0;
-  return Math.abs(parseFloat(value));
+function getMetricValue(option: Option, metric: Metric): number | null {
+  const raw = option[metric];
+  if (raw === null || raw === undefined || raw === '') return null;
+  return Math.abs(parseFloat(raw));
 }
 
 function transformData(
@@ -45,8 +45,10 @@ function transformData(
       direction === 'calls' ? optionChain.calls : optionChain.puts;
 
     options.forEach((option, strikeIndex) => {
-      const value = getMetricValue(option, metric);
-      maxValue = Math.max(maxValue, value);
+      const value = option !== null ? getMetricValue(option, metric) : null;
+      if (value !== null) {
+        maxValue = Math.max(maxValue, value);
+      }
 
       cells.push({
         strike: data.strikes[strikeIndex] ?? '',
@@ -134,6 +136,7 @@ export function Heatmap({
   const cellHeight = yScale.bandwidth();
 
   const handleCellClick = (cell: CellData) => {
+    if (!cell.option) return;
     const ticker = data.ticker;
     const t = ticker.replace('/', '');
     const baseUrl = 'https://www.nasdaq.com/market-activity/stocks';
@@ -161,6 +164,9 @@ export function Heatmap({
         <Group top={MARGIN.top} left={MARGIN.left}>
           {/* Heatmap cells */}
           {cells.map((cell) => {
+            // Don't render anything for non-existent options
+            if (cell.option === null) return null;
+
             const x = xScale(cell.dateStr) ?? 0;
             const y = yScale(cell.strike) ?? 0;
 
@@ -171,7 +177,9 @@ export function Heatmap({
                 y={y}
                 width={cellWidth}
                 height={cellHeight}
-                fill={cell.value > 0 ? colorScale(cell.value) : 'transparent'} // todo: differentiate between null/undefined and 0. cell.value should be /undefined if the option is null or doesn't exist?.
+                fill={
+                  cell.value !== null ? colorScale(cell.value) : 'transparent'
+                }
                 className="cursor-pointer hover:brightness-90"
                 style={{
                   transition:
@@ -274,12 +282,9 @@ export function Heatmap({
                 metric.slice(1).replace('_', ' ')}
               :{' '}
               <span className="font-semibold text-foreground">
-                {tooltipData.value > 0
+                {tooltipData.value !== null
                   ? tooltipData.value.toLocaleString()
-                  : tooltipData.option[metric] === null
-                    ? 'N/A'
-                    : 'N/A'}
-                {/* todo: ^ make sure we're handling null/undefined correctly */}
+                  : 'N/A'}
               </span>
             </div>
           </div>
