@@ -20,7 +20,7 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
           className="flex items-center gap-4 mr-1 sm:mr-4 shrink-0 hover:opacity-70 transition-opacity cursor-pointer"
           aria-label="Reset to default state"
         >
-          <img src="/logo.svg" alt="Options Heatmap" className="h-6 w-6 shrink-0" />
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Options Heatmap" className="h-6 w-6 shrink-0" />
           <span className="font-semibold text-lg hidden sm:inline-block">
             Heatstrike
           </span>
