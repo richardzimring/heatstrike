@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { Group } from '@visx/group';
 import { scaleLinear, scaleBand } from '@visx/scale';
@@ -140,7 +140,36 @@ export function Heatmap({
   const cellWidth = xScale.bandwidth();
   const cellHeight = yScale.bandwidth();
 
-  const handleCellClick = (cell: CellData) => {
+  const [activeCellKey, setActiveCellKey] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up debounced hide on unmount
+  useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    };
+  }, []);
+
+  // Dismiss tooltip when tapping anywhere outside the heatmap container
+  useEffect(() => {
+    if (!isMobile || activeCellKey === null) return;
+
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setActiveCellKey(null);
+        hideTooltip();
+      }
+    };
+
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, [isMobile, activeCellKey, hideTooltip]);
+
+  const navigateToNasdaq = (cell: CellData) => {
     if (!cell.option) return;
     const ticker = data.ticker;
     const t = ticker.replace('/', '');
@@ -155,16 +184,70 @@ export function Heatmap({
     window.open(nasUrl, '_blank');
   };
 
-  const handleCellHover = (cell: CellData, x: number, y: number) => {
+  const getRelativePosition = (e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0 };
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  };
+
+  const handleCellClick = (cell: CellData, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!cell.option) return;
+
+    if (isMobile) {
+      const cellKey = `${cell.dateIndex}-${cell.strikeIndex}`;
+      if (activeCellKey === cellKey) {
+        // Second tap on same cell → navigate
+        navigateToNasdaq(cell);
+        setActiveCellKey(null);
+        hideTooltip();
+      } else {
+        // First tap → show tooltip at tap position
+        const { x, y } = getRelativePosition(e);
+        setActiveCellKey(cellKey);
+        showTooltip({
+          tooltipData: cell,
+          tooltipLeft: x,
+          tooltipTop: y,
+        });
+      }
+    } else {
+      navigateToNasdaq(cell);
+    }
+  };
+
+  const handleBackgroundTap = () => {
+    if (activeCellKey !== null) {
+      setActiveCellKey(null);
+      hideTooltip();
+    }
+  };
+
+  const handleCellHover = (cell: CellData, e: React.MouseEvent) => {
+    if (isMobile) return;
+    // Cancel any pending hide so the tooltip doesn't flicker between cells
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    const { x, y } = getRelativePosition(e);
     showTooltip({
       tooltipData: cell,
-      tooltipLeft: x + MARGIN.left + cellWidth / 2,
-      tooltipTop: y + MARGIN.top,
+      tooltipLeft: x,
+      tooltipTop: y,
     });
   };
 
+  const debouncedHideTooltip = () => {
+    if (isMobile) return;
+    hideTimeoutRef.current = setTimeout(() => {
+      hideTooltip();
+      hideTimeoutRef.current = null;
+    }, 50);
+  };
+
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative" onClick={handleBackgroundTap}>
       <svg width={width} height={height}>
         <Group top={MARGIN.top} left={MARGIN.left}>
           {/* Heatmap cells */}
@@ -185,14 +268,26 @@ export function Heatmap({
                 fill={
                   cell.value !== null ? colorScale(cell.value) : 'transparent'
                 }
+                stroke={
+                  isMobile &&
+                  activeCellKey === `${cell.dateIndex}-${cell.strikeIndex}`
+                    ? 'hsl(var(--foreground))'
+                    : 'none'
+                }
+                strokeWidth={
+                  isMobile &&
+                  activeCellKey === `${cell.dateIndex}-${cell.strikeIndex}`
+                    ? 1.5
+                    : 0
+                }
                 className="cursor-pointer hover:brightness-90"
                 style={{
                   transition:
                     'fill 300ms ease-in-out, filter 150ms ease-in-out',
                 }}
-                onClick={() => handleCellClick(cell)}
-                onMouseEnter={() => handleCellHover(cell, x, y)}
-                onMouseLeave={() => hideTooltip()}
+                onClick={(e) => handleCellClick(cell, e)}
+                onMouseMove={(e) => handleCellHover(cell, e)}
+                onMouseLeave={debouncedHideTooltip}
               />
             );
           })}
@@ -272,12 +367,12 @@ export function Heatmap({
         <TooltipWithBounds
           top={tooltipTop}
           left={tooltipLeft}
-          offsetTop={-12}
-          offsetLeft={0}
+          offsetTop={-Math.max(cellHeight * 0.15, 12)}
+          offsetLeft={Math.max(cellWidth * 0.15, 12)}
           className="pointer-events-none"
           style={{
             position: 'absolute',
-            backgroundColor: 'hsl(var(--popover))',
+            backgroundColor: 'hsl(var(--popover) / 0.925)',
             color: 'hsl(var(--popover-foreground))',
             border: '1px solid hsl(var(--border))',
             borderRadius: '8px',
@@ -301,6 +396,11 @@ export function Heatmap({
                   : 'N/A'}
               </span>
             </div>
+            {isMobile && (
+              <div className="text-muted-foreground text-[11px] pt-0.5">
+                Tap again to view details
+              </div>
+            )}
           </div>
         </TooltipWithBounds>
       )}
