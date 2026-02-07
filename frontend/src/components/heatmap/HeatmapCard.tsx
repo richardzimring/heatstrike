@@ -168,7 +168,7 @@ export function HeatmapCard({
       </Card>
 
       {/* Updated time footnote */}
-      <div className="text-xs text-muted-foreground text-right shrink-0">
+      <div className="hidden sm:block text-xs text-muted-foreground text-right shrink-0">
         Updated {formatRelativeTime(data.updated_at)}
       </div>
     </div>

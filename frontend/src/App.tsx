@@ -21,7 +21,7 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-dvh flex flex-col bg-background overflow-hidden">
       <Header
         ticker={ticker}
         setTicker={setTicker}
