@@ -1,0 +1,86 @@
+---
+globs: backend/**.*
+alwaysApply: false
+---
+
+# Backend — Serverless Hono API
+
+## Stack
+
+- Serverless Framework v4 + AWS Lambda + API Gateway (HTTP API)
+- Hono with `@hono/zod-openapi` for typed, documented routes
+- AWS DynamoDB (caching), S3 (ticker list storage), SES (emails)
+- Zod for validation + OpenAPI schema generation
+- Node 24, TypeScript (strict mode, `noUncheckedIndexedAccess`)
+
+## Project Structure
+
+```
+backend/
+  lambdas/              # Lambda entry points — thin wrappers only
+    api.ts              # Main API handler (all HTTP routes)
+    refreshTickers.ts   # Scheduled daily ticker refresh
+  scripts/
+    generate-openapi.ts # Writes openapi.json from route definitions
+  src/
+    app.ts              # Hono app — middleware, route mounting, error handlers
+    constants.ts        # Env vars (validated at runtime), config values
+    routes/             # One file per resource, each exports an OpenAPIHono router
+    schemas/            # Zod schemas with .openapi() metadata for each route
+    services/           # Business logic and orchestration
+    requests/           # External API calls (Tradier)
+    types/              # Types for external APIs (Tradier response shapes)
+    utils/              # Pure utility functions
+```
+
+## Key Patterns
+
+### Adding a New Route
+
+1. **Schema** (`src/schemas/`): Define request params/body and response schemas using `z` from `@hono/zod-openapi`. Add `.openapi()` metadata (examples, descriptions). Export inferred types.
+2. **Route** (`src/routes/`): Create router with `new OpenAPIHono()`, define the route with `createRoute()`, implement the handler. See `routes/options.ts` for the canonical example.
+3. **Service** (`src/services/`): Put business logic here, not in route handlers. Routes should validate input and call services.
+4. **Mount** in `src/app.ts` via `app.route('/', yourRouter)` and re-export from `routes/index.ts`.
+5. **Wire up** the HTTP event in `serverless.yml` under the API function's `events`.
+
+### Schemas & Types
+
+Zod schemas serve double duty — runtime validation and OpenAPI spec generation. Always infer TypeScript types from schemas:
+
+```typescript
+export const MySchema = z.object({ ... }).openapi('MySchema');
+export type MyType = z.infer<typeof MySchema>;
+```
+
+### Caching
+
+Options data is cached in DynamoDB with a 1-hour TTL (see `constants.ts` for `CACHE_TTL_MS`). Error responses are also cached to avoid hammering Tradier on bad tickers.
+
+### External APIs
+
+All Tradier API calls live in `src/requests/`. These are called by services, never directly from routes.
+
+### Environment Variables
+
+Defined in `serverless.yml`, sourced from SSM Parameter Store in production. Validated at runtime in `constants.ts` — if a required var is missing, the Lambda fails fast.
+
+## Infrastructure
+
+Defined in `serverless.yml` resources section:
+- DynamoDB table (PAY_PER_REQUEST, partition key: `ticker`)
+- S3 bucket (ticker list)
+- IAM permissions for DynamoDB, S3, SES
+
+## Guidelines
+
+- Do not cast to `any`. Use Zod to parse unknown inputs.
+- Do not use eslint disables unless absolutely necessary
+- Keep Lambda handlers thin — business logic belongs in services
+- Fetch latest Hono guidance from https://hono.dev/llms.txt when working with routes or middleware
+
+## After Making Changes
+
+- Run `npm run lint` from `backend/`
+- If you changed any route interface (params, body, response shape), regenerate the OpenAPI spec: `npm run generate:openapi`
+- The frontend consumes `backend/openapi.json` — after regenerating, the frontend needs `npm run generate:api` to pick up changes
+- Do not write or run tests

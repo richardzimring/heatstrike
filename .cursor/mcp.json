@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "shadcn/ui": {
+      "command": "npx shadcn@latest mcp",
+      "env": {},
+      "args": []
+    }
+  }
+}

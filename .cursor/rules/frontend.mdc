@@ -1,0 +1,80 @@
+---
+globs: frontend/**.*
+alwaysApply: false
+---
+
+# Frontend — React + Vite SPA
+
+## Stack
+
+- React 19 + TypeScript + Vite
+- Tailwind CSS 4 (via `@tailwindcss/vite`)
+- shadcn/ui (New York style) + Radix UI primitives
+- Tanstack Query for server state
+- @visx for data visualization (heatmap)
+- Hey API (`@hey-api/openapi-ts`) for generated API client
+- next-themes for dark/light mode
+
+## Project Structure
+
+```
+frontend/src/
+  App.tsx              # Root component, providers, Dashboard
+  components/
+    controls/          # User input components (ticker, metric, direction selects)
+    heatmap/           # Visualization components (visx-based heatmap)
+    layout/            # App shell (Header, ThemeProvider, ThemeToggle)
+    ui/                # shadcn/ui primitives — do not edit by hand
+  hooks/               # Custom React Query hooks (useOptionsData, useTickers)
+  lib/
+    api/generated/     # Auto-generated API client — do not edit
+    queryClient.ts     # Singleton QueryClient config
+    utils.ts           # Shared utilities (cn, formatRelativeTime)
+  types/index.ts       # App-wide types derived from API types
+```
+
+## Key Patterns
+
+### API Client & Data Fetching
+
+The API client is auto-generated from the backend OpenAPI spec. Never edit files in `lib/api/generated/`.
+
+Data fetching hooks follow this pattern (see `hooks/useOptionsData.ts`):
+
+1. Import the generated SDK function and configure the client
+2. Write a thin async wrapper that calls the SDK and throws on error
+3. Export a `useQuery` hook with a descriptive query key
+
+### Types
+
+App types are derived from the generated API types — see `types/index.ts`. Use `Extract`, indexed access types, and `z.infer<>` instead of manually duplicating type definitions.
+
+### Components
+
+- Feature folders under `components/` (controls, heatmap, layout)
+- shadcn/ui components in `components/ui/` — add new ones via the shadcn CLI, don't write by hand
+- Use `cn()` from `lib/utils` for conditional Tailwind classes
+- Props interfaces defined inline above the component
+
+### Styling
+
+- Tailwind utility classes; theme tokens defined as CSS variables in `src/index.css`
+- Light/dark mode via CSS variables and `next-themes`
+- Custom colors are defined in `src/index.css`
+- Use semantic tokens (`bg-background`, `text-foreground`, `text-muted-foreground`, etc.)
+
+## Guidelines
+
+- No routing library — this is a single-page dashboard
+- No global state store — Tanstack Query for server state, `useState` for UI state
+- Do not cast to `any`. Parse unknown external inputs with Zod.
+- Do not use eslint disables unless absolutely necessary
+- Use the shadcn MCP tools to get docs and examples when adding UI components
+- Fetch latest Hey API guidance from https://heyapi.dev/llms.txt when working with the API client
+
+## After Making Changes
+
+- Run `npm run lint` from `frontend/`
+- If you changed how the frontend calls the API (e.g., new endpoints), run `npm run generate:api` to regenerate the client from the backend's `openapi.json`
+- Do not run the dev server
+- Do not write or run tests
