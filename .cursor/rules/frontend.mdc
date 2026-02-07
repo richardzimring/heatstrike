@@ -9,7 +9,7 @@ alwaysApply: false
 
 - React 19 + TypeScript + Vite
 - Tailwind CSS 4 (via `@tailwindcss/vite`)
-- shadcn/ui (New York style) + Radix UI primitives
+- shadcn/ui (New York style) — uses the unified `radix-ui` package for primitives
 - Tanstack Query for server state
 - @visx for data visualization (heatmap)
 - Hey API (`@hey-api/openapi-ts`) for generated API client
