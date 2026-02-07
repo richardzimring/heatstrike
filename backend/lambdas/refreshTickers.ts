@@ -1,7 +1,7 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { TICKERS_BUCKET_NAME } from '../src/constants';
 
 const s3 = new S3Client({});
-const BUCKET_NAME = process.env.TICKERS_BUCKET_NAME!;
 
 const OCC_URL =
   'https://marketdata.theocc.com/delo-download?prodType=EU&downloadFields=US;SN;EXCH&format=txt';
@@ -40,8 +40,12 @@ function parseOccData(raw: string): Ticker[] {
     const parts = trimmed.split('\t');
     if (parts.length < 2) continue;
 
-    const ticker = parts[0]!.trim();
-    const name = parts[1]!.trim();
+    const rawTicker = parts[0];
+    const rawName = parts[1];
+    if (!rawTicker || !rawName) continue;
+
+    const ticker = rawTicker.trim();
+    const name = rawName.trim();
     const exchanges = parts[2]?.trim() ?? '';
 
     // Skip header lines (they typically contain "Symbol" or don't look like tickers)
@@ -49,9 +53,7 @@ function parseOccData(raw: string): Ticker[] {
 
     // Filter: keep only tickers listed on at least one major exchange
     if (exchanges) {
-      const hasMainExchange = [...exchanges].some((ch) =>
-        MAJOR_EXCHANGES.has(ch),
-      );
+      const hasMainExchange = [...exchanges].some((ch) => MAJOR_EXCHANGES.has(ch));
       if (!hasMainExchange) continue;
     }
 
@@ -70,9 +72,7 @@ export const handler = async (): Promise<void> => {
 
   const response = await fetch(OCC_URL);
   if (!response.ok) {
-    throw new Error(
-      `OCC API returned ${response.status}: ${response.statusText}`,
-    );
+    throw new Error(`OCC API returned ${response.status}: ${response.statusText}`);
   }
 
   const raw = await response.text();
@@ -86,7 +86,7 @@ export const handler = async (): Promise<void> => {
 
   await s3.send(
     new PutObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: TICKERS_BUCKET_NAME,
       Key: 'tickers.json',
       Body: json,
       ContentType: 'application/json',

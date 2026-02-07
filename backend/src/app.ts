@@ -37,7 +37,7 @@ app.doc('/openapi.json', {
   },
   servers: [
     {
-      url: 'https://2i7z2aank8.execute-api.us-east-2.amazonaws.com',
+      url: 'https://bcwqcc975a.execute-api.us-east-2.amazonaws.com',
       description: 'Production',
     },
     {

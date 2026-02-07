@@ -131,12 +131,13 @@ export async function getOptionsData(
     const response = await fetchFreshData(ticker);
 
     // Cache the response (don't await to avoid blocking response)
-    void saveToCache(response);
+    void saveToCache(response).catch((err) => {
+      console.error('Failed to cache options data:', err);
+    });
 
     return response;
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
     // Log the actual error for observability
     console.error(`Error fetching options data for ${ticker}:`, error);
@@ -144,7 +145,9 @@ export async function getOptionsData(
     const errorResponse = createErrorResponse(ticker, errorMessage);
 
     // Cache the error response
-    void saveToCache(errorResponse);
+    void saveToCache(errorResponse).catch((err) => {
+      console.error('Failed to cache error response:', err);
+    });
 
     return errorResponse;
   }

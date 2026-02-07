@@ -24,7 +24,7 @@ const doc = app.getOpenAPIDocument({
   },
   servers: [
     {
-      url: 'https://vk3egx5xz0.execute-api.us-east-2.amazonaws.com',
+      url: 'https://bcwqcc975a.execute-api.us-east-2.amazonaws.com',
       description: 'Production',
     },
     {

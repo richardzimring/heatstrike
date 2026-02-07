@@ -67,8 +67,7 @@ export async function fetchOptionData(
       const ask = option.ask;
       const price =
         bid !== null && ask !== null ? ((ask + bid) / 2).toFixed(2) : null;
-      const spread =
-        bid !== null && ask !== null ? (ask - bid).toFixed(2) : null;
+      const spread = bid !== null && ask !== null ? (ask - bid).toFixed(2) : null;
 
       return {
         symbol: option.symbol,
@@ -96,9 +95,7 @@ export async function fetchOptionData(
   // Get unique integer strikes, sorted
   const uniqueStrikes = [
     ...new Set(
-      processed.flatMap((options) =>
-        options.map((opt) => parseFloat(opt.strike)),
-      ),
+      processed.flatMap((options) => options.map((opt) => parseFloat(opt.strike))),
     ),
   ]
     .sort((a, b) => a - b)

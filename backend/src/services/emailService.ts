@@ -1,9 +1,5 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-import {
-  AWS_REGION,
-  BUG_REPORT_SENDER,
-  BUG_REPORT_RECIPIENT,
-} from '../constants';
+import { AWS_REGION, BUG_REPORT_SENDER, BUG_REPORT_RECIPIENT } from '../constants';
 import type { BugReportRequest } from '../schemas/bugReport';
 
 const sesClient = new SESClient({ region: AWS_REGION });
@@ -11,9 +7,7 @@ const sesClient = new SESClient({ region: AWS_REGION });
 /**
  * Send a bug report email via AWS SES
  */
-export async function sendBugReportEmail(
-  report: BugReportRequest,
-): Promise<void> {
+export async function sendBugReportEmail(report: BugReportRequest): Promise<void> {
   const timestamp = new Date().toISOString();
 
   const bodyLines = [

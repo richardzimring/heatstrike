@@ -15,6 +15,9 @@ export const AWS_REGION = process.env.AWS_REGION ?? 'us-east-2';
 // DynamoDB
 export const OPTIONS_TABLE_NAME = getEnvironmentVariable('OPTIONS_TABLE_NAME');
 
+// S3
+export const TICKERS_BUCKET_NAME = getEnvironmentVariable('TICKERS_BUCKET_NAME');
+
 // Tradier API
 export const TRADIER_KEY = getEnvironmentVariable('TRADIER_KEY');
 export const TRADIER_BASE_URL = 'https://sandbox.tradier.com/v1/markets';

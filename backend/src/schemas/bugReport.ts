@@ -29,9 +29,7 @@ export const BugReportRequestSchema = z
  */
 export const BugReportSuccessResponseSchema = z
   .object({
-    message: z
-      .string()
-      .openapi({ example: 'Bug report submitted successfully' }),
+    message: z.string().openapi({ example: 'Bug report submitted successfully' }),
   })
   .openapi('BugReportSuccessResponse');
 
@@ -46,6 +44,4 @@ export type BugReportRequest = z.infer<typeof BugReportRequestSchema>;
 export type BugReportSuccessResponse = z.infer<
   typeof BugReportSuccessResponseSchema
 >;
-export type BugReportErrorResponse = z.infer<
-  typeof BugReportErrorResponseSchema
->;
+export type BugReportErrorResponse = z.infer<typeof BugReportErrorResponseSchema>;

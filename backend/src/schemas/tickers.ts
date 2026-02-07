@@ -6,9 +6,7 @@ import { z } from '@hono/zod-openapi';
 export const TickerEntrySchema = z
   .object({
     t: z.string().openapi({ example: 'AAPL', description: 'Ticker symbol' }),
-    n: z
-      .string()
-      .openapi({ example: 'Apple Inc', description: 'Company name' }),
+    n: z.string().openapi({ example: 'Apple Inc', description: 'Company name' }),
   })
   .openapi('TickerEntry');
 

@@ -2,14 +2,13 @@ import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { TickersResponseSchema } from '../schemas/tickers';
 import type { TickersResponse } from '../schemas/tickers';
+import { TICKERS_BUCKET_NAME, CACHE_TTL_MS } from '../constants';
 
 const s3 = new S3Client({});
-const BUCKET_NAME = process.env.TICKERS_BUCKET_NAME ?? '';
 
 // In-memory cache so we don't re-read S3 on every invocation within the same Lambda instance
 let cachedTickers: TickersResponse | null = null;
 let cacheTimestamp = 0;
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 async function loadTickers(): Promise<TickersResponse> {
   const now = Date.now();
@@ -19,7 +18,7 @@ async function loadTickers(): Promise<TickersResponse> {
 
   const result = await s3.send(
     new GetObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: TICKERS_BUCKET_NAME,
       Key: 'tickers.json',
     }),
   );

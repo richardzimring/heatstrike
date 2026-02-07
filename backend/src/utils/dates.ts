@@ -28,6 +28,7 @@ export function stringifyDates(dates: string[]): string[] {
     const day = parts[2] ?? '01';
     const monthIndex = parseInt(month, 10) - 1;
     const dayNum = parseInt(day, 10);
-    return `${MONTHS[monthIndex]} ${dayNum}`;
+    const monthName = MONTHS[monthIndex] ?? 'Unknown';
+    return `${monthName} ${dayNum}`;
   });
 }
