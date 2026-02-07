@@ -14,13 +14,13 @@ interface HeaderProps {
 export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-      <div className="flex h-14 w-full max-w-6xl mx-auto items-center px-6 gap-4">
+      <div className="flex h-14 w-full max-w-6xl mx-auto items-center px-3 sm:px-6 gap-3 sm:gap-4">
         <button
           onClick={onReset}
-          className="flex items-center gap-4 mr-4 hover:opacity-70 transition-opacity cursor-pointer"
+          className="flex items-center gap-4 mr-1 sm:mr-4 shrink-0 hover:opacity-70 transition-opacity cursor-pointer"
           aria-label="Reset to default state"
         >
-          <img src="/logo.svg" alt="Options Heatmap" className="h-6 w-6" />
+          <img src="/logo.svg" alt="Options Heatmap" className="h-6 w-6 shrink-0" />
           <span className="font-semibold text-lg hidden sm:inline-block">
             Heatstrike
           </span>

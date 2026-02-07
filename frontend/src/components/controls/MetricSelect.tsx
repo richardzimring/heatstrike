@@ -17,7 +17,7 @@ interface MetricSelectProps {
 export function MetricSelect({ value, onChange }: MetricSelectProps) {
   return (
     <Select value={value} onValueChange={(v) => onChange(v as Metric)}>
-      <SelectTrigger size="sm" className="w-[150px]">
+      <SelectTrigger size="sm" className="w-full sm:w-[150px]">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

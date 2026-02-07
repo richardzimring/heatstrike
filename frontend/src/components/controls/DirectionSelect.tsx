@@ -17,7 +17,7 @@ interface DirectionSelectProps {
 export function DirectionSelect({ value, onChange }: DirectionSelectProps) {
   return (
     <Select value={value} onValueChange={(v) => onChange(v as Direction)}>
-      <SelectTrigger size="sm" className="w-[90px]">
+      <SelectTrigger size="sm" className="w-full sm:w-[90px]">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

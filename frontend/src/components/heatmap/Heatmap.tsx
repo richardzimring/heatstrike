@@ -6,7 +6,9 @@ import { AxisLeft, AxisBottom } from '@visx/axis';
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip';
 import type { OptionsDataResponse, Direction, Metric, Option } from '@/types';
 
-const MARGIN = { top: 10, right: 20, bottom: 60, left: 80 };
+const MARGIN_DESKTOP = { top: 10, right: 20, bottom: 55, left: 70 };
+const MARGIN_MOBILE = { top: 4, right: 4, bottom: 4, left: 4 };
+const MOBILE_BREAKPOINT = 500;
 
 interface HeatmapProps {
   data: OptionsDataResponse;
@@ -81,6 +83,9 @@ export function Heatmap({
     hideTooltip,
     showTooltip,
   } = useTooltip<CellData>();
+
+  const isMobile = width < MOBILE_BREAKPOINT;
+  const MARGIN = isMobile ? MARGIN_MOBILE : MARGIN_DESKTOP;
 
   const { cells, maxValue } = useMemo(
     () => transformData(data, direction, metric),
@@ -192,64 +197,73 @@ export function Heatmap({
             );
           })}
 
-          {/* Y Axis - Strike Prices */}
-          <AxisLeft
-            scale={yScale}
-            tickFormat={(v) => v}
-            stroke="transparent"
-            tickStroke="transparent"
-            tickLabelProps={() => ({
-              fill: 'hsl(var(--muted-foreground))',
-              fontSize: 11,
-              fontFamily: 'inherit',
-              textAnchor: 'end',
-              dominantBaseline: 'middle',
-              dx: -4,
-            })}
-            hideTicks
-          />
+          {/* Y Axis - Strike Prices (hidden on mobile) */}
+          {!isMobile && (
+            <AxisLeft
+              scale={yScale}
+              tickFormat={(v) => v}
+              stroke="transparent"
+              tickStroke="transparent"
+              tickLabelProps={() => ({
+                fill: 'hsl(var(--muted-foreground))',
+                fontSize: 11,
+                fontFamily: 'inherit',
+                textAnchor: 'end',
+                dominantBaseline: 'middle',
+                dx: -4,
+              })}
+              hideTicks
+            />
+          )}
 
-          {/* X Axis - Expiration Dates */}
-          <AxisBottom
-            top={innerHeight}
-            scale={xScale}
-            tickFormat={(v) => v}
-            stroke="transparent"
-            tickStroke="transparent"
-            tickLabelProps={() => ({
-              fill: 'hsl(var(--muted-foreground))',
-              fontSize: 11,
-              fontFamily: 'inherit',
-              textAnchor: 'middle',
-              dominantBaseline: 'hanging',
-            })}
-            hideTicks
-          />
+          {/* X Axis - Expiration Dates (hidden on mobile) */}
+          {!isMobile && (
+            <AxisBottom
+              top={innerHeight}
+              scale={xScale}
+              tickFormat={(v) => v}
+              stroke="transparent"
+              tickStroke="transparent"
+              tickLabelProps={() => ({
+                fill: 'hsl(var(--muted-foreground))',
+                fontSize: 11,
+                fontFamily: 'inherit',
+                textAnchor: 'middle',
+                dominantBaseline: 'hanging',
+                dy: -6,
+              })}
+              hideTicks
+            />
+          )}
 
-          {/* Axis Labels */}
-          <text
-            x={-innerHeight / 2}
-            y={-65}
-            transform="rotate(-90)"
-            fill="currentColor"
-            fontSize={13}
-            fontWeight={600}
-            textAnchor="middle"
-            className="text-foreground"
-          >
-            Strike Price
-          </text>
-          <text
-            x={innerWidth / 2}
-            y={innerHeight + 55}
-            fill="currentColor"
-            fontSize={13}
-            fontWeight={600}
-            textAnchor="middle"
-            className="text-foreground"
-          >
-            Expiration Date
-          </text>
+          {/* Axis Labels (hidden on mobile) */}
+          {!isMobile && (
+            <>
+              <text
+                x={-innerHeight / 2}
+                y={-60}
+                transform="rotate(-90)"
+                fill="currentColor"
+                fontSize={13}
+                fontWeight={500}
+                textAnchor="middle"
+                className="text-foreground"
+              >
+                Strike Price
+              </text>
+              <text
+                x={innerWidth / 2}
+                y={innerHeight + 50}
+                fill="currentColor"
+                fontSize={13}
+                fontWeight={500}
+                textAnchor="middle"
+                className="text-foreground"
+              >
+                Expiration Date
+              </text>
+            </>
+          )}
         </Group>
       </svg>
 

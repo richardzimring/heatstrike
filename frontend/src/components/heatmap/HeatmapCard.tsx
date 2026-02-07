@@ -80,9 +80,9 @@ export function HeatmapCard({
   const TrendIcon = isPositiveChange ? TrendingUp : TrendingDown;
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col flex-1 gap-4 min-h-0">
       {/* Header outside card */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 shrink-0">
         {/* Left side - Stock info */}
         <div className="flex flex-col gap-1">
           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -109,33 +109,35 @@ export function HeatmapCard({
         </div>
 
         {/* Right side - Controls */}
-        <div className="flex items-center gap-2 self-end">
+        <div className="flex gap-2 w-full sm:w-auto sm:self-end">
           <DirectionSelect value={direction} onChange={setDirection} />
           <MetricSelect value={metric} onChange={setMetric} />
         </div>
       </div>
 
       {/* Card with heatmap */}
-      <Card className="border-border">
-        <CardContent className="p-4">
-          <div className="h-[480px] w-full">
-            <ParentSize>
-              {({ width, height }) => (
-                <Heatmap
-                  data={data}
-                  direction={direction}
-                  metric={metric}
-                  width={width}
-                  height={height}
-                />
-              )}
-            </ParentSize>
+      <Card className="border-border flex-1 flex flex-col min-h-0">
+        <CardContent className="p-2 sm:p-4 flex-1 flex flex-col min-h-0">
+          <div className="relative flex-1 w-full min-h-[300px]">
+            <div className="absolute inset-0">
+              <ParentSize>
+                {({ width, height }) => (
+                  <Heatmap
+                    data={data}
+                    direction={direction}
+                    metric={metric}
+                    width={width}
+                    height={height}
+                  />
+                )}
+              </ParentSize>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Updated time footnote */}
-      <div className="text-xs text-muted-foreground text-right">
+      <div className="text-xs text-muted-foreground text-right shrink-0">
         Updated {formatRelativeTime(data.updated_at)}
       </div>
     </div>
