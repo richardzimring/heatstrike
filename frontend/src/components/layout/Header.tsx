@@ -1,6 +1,7 @@
 import { Github } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { FeedbackDialog } from './FeedbackDialog';
+import { InfoDialog } from './InfoDialog';
 import { Button } from '@/components/ui/button';
 import { TickerInput } from '@/components/controls/TickerInput';
 
@@ -20,7 +21,11 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
           className="flex items-center gap-4 mr-1 sm:mr-4 shrink-0 hover:opacity-70 transition-opacity cursor-pointer"
           aria-label="Reset to default state"
         >
-          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Options Heatmap" className="h-6 w-6 shrink-0" />
+          <img
+            src={`${import.meta.env.BASE_URL}logo.svg`}
+            alt="Options Heatmap"
+            className="h-6 w-6 shrink-0"
+          />
           <span className="font-semibold text-lg hidden sm:inline-block">
             Heatstrike
           </span>
@@ -37,6 +42,8 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
 
         <div className="flex flex-1 items-center justify-end gap-2">
           <ThemeToggle />
+          <InfoDialog />
+          <FeedbackDialog />
           <Button variant="ghost" size="icon" asChild>
             <a
               href="https://github.com/richardzimring/heatstrike"
@@ -47,7 +54,6 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
               <Github className="h-5 w-5" />
             </a>
           </Button>
-          <FeedbackDialog />
         </div>
       </div>
     </header>
