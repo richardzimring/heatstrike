@@ -27,13 +27,13 @@ function LoadingState() {
         {/* Left side - Stock info skeleton */}
         <div className="flex flex-col gap-1 w-full sm:w-auto">
           {/* Ticker */}
-          <Skeleton className="h-4 w-full sm:w-12 rounded" />
+          <Skeleton className="h-4 w-12 rounded" />
           {/* Description */}
-          <Skeleton className="h-8 w-full sm:w-48 rounded" />
+          <Skeleton className="h-8 w-48 rounded" />
           {/* Price + change row */}
           <div className="flex items-baseline gap-2 mt-1">
-            <Skeleton className="h-8 w-full sm:w-28 rounded" />
-            <Skeleton className="h-5 w-full sm:w-32 rounded" />
+            <Skeleton className="h-8 w-28 rounded" />
+            <Skeleton className="h-5 w-32 rounded" />
           </div>
         </div>
 
