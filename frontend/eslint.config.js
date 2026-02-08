@@ -11,6 +11,7 @@ export default defineConfig([
     'dist/**/*',
     'node_modules/**/*',
     'src/lib/api/generated/**/*',
+    'src/routeTree.gen.ts',
   ]),
 
   // Base configurations

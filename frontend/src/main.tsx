@@ -1,8 +1,22 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { client } from '@/lib/api/generated/client.gen';
+import { routeTree } from './routeTree.gen';
 import './index.css';
-import App from './App.tsx';
+
+// Create the router instance
+const router = createRouter({
+  routeTree,
+  basepath: '/heatstrike/',
+});
+
+// Register the router for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
 
 // Configure API client once before the app renders
 client.setConfig({ baseUrl: import.meta.env.VITE_API_URL });
@@ -14,6 +28,6 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </StrictMode>,
 );

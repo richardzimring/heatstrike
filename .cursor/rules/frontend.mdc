@@ -10,7 +10,8 @@ alwaysApply: false
 - React 19 + TypeScript + Vite
 - Tailwind CSS 4 (via `@tailwindcss/vite`)
 - shadcn/ui (New York style) — uses the unified `radix-ui` package for primitives
-- Tanstack Query for server state
+- TanStack Router for file-based routing and deep linking
+- TanStack Query for server state
 - @visx for data visualization (heatmap)
 - Hey API (`@hey-api/openapi-ts`) for generated API client
 - next-themes for dark/light mode
@@ -20,8 +21,14 @@ alwaysApply: false
 
 ```
 frontend/src/
-  App.tsx              # Root component, providers, Dashboard
+  main.tsx             # Entry point, router setup
+  routeTree.gen.ts     # Auto-generated route tree — do not edit
+  routes/
+    __root.tsx         # Root layout with providers
+    index.tsx          # Redirects / to default ticker
+    $ticker.tsx        # Main dashboard route with search params
   components/
+    Dashboard.tsx      # Main dashboard component
     controls/          # User input components (ticker, metric, direction selects)
     heatmap/           # Visualization components (visx-based heatmap)
     layout/            # App shell (Header, ThemeProvider, ThemeToggle)
@@ -65,10 +72,19 @@ App types are derived from the generated API types — see `types/index.ts`. Use
 - Custom colors are defined in `src/index.css`
 - Use semantic tokens (`bg-background`, `text-foreground`, `text-muted-foreground`, etc.)
 
+## Routing & Deep Linking
+
+TanStack Router provides file-based routing with deep linking support:
+
+- **URL structure**: `/heatstrike/$ticker?direction=calls&metric=volume`
+- **Path params**: ticker (e.g., `AAPL`)
+- **Search params**: `direction` (calls/puts), `metric` (volume, open_interest, etc.)
+- Routes are defined in `src/routes/` — the Vite plugin auto-generates `routeTree.gen.ts`
+- Use `useParams()` and `useSearch()` to read URL state, `useNavigate()` to update it
+
 ## Guidelines
 
-- No routing library — this is a single-page dashboard
-- No global state store — Tanstack Query for server state, `useState` for UI state
+- No global state store — TanStack Query for server state, URL params for UI state
 - Do not cast to `any`. Parse unknown external inputs with Zod.
 - Do not use eslint disables unless absolutely necessary
 - Use the shadcn MCP tools to get docs and examples when adding UI components

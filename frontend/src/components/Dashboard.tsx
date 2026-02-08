@@ -1,23 +1,46 @@
-import { useState } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
-import { ThemeProvider } from '@/components/layout/ThemeProvider';
+import { useParams, useSearch, useNavigate } from '@tanstack/react-router';
 import { Header } from '@/components/layout/Header';
 import { HeatmapCard } from '@/components/heatmap/HeatmapCard';
 import { useOptionsData } from '@/hooks/useOptionsData';
 import type { Direction, Metric } from '@/types';
 
-function Dashboard() {
-  const [ticker, setTicker] = useState('AAPL');
-  const [direction, setDirection] = useState<Direction>('calls');
-  const [metric, setMetric] = useState<Metric>('volume');
+export function Dashboard() {
+  const { ticker } = useParams({ from: '/$ticker' });
+  const { direction, metric } = useSearch({ from: '/$ticker' });
+  const navigate = useNavigate();
 
   const { data, isLoading, error } = useOptionsData(ticker);
 
+  const setTicker = (newTicker: string) => {
+    navigate({
+      to: '/$ticker',
+      params: { ticker: newTicker },
+      search: { direction, metric },
+    });
+  };
+
+  const setDirection = (newDirection: Direction) => {
+    navigate({
+      to: '/$ticker',
+      params: { ticker },
+      search: { direction: newDirection, metric },
+    });
+  };
+
+  const setMetric = (newMetric: Metric) => {
+    navigate({
+      to: '/$ticker',
+      params: { ticker },
+      search: { direction, metric: newMetric },
+    });
+  };
+
   const handleReset = () => {
-    setTicker('AAPL');
-    setDirection('calls');
-    setMetric('volume');
+    navigate({
+      to: '/$ticker',
+      params: { ticker: 'AAPL' },
+      search: { direction: 'calls', metric: 'volume' },
+    });
   };
 
   return (
@@ -43,15 +66,5 @@ function Dashboard() {
         </div>
       </main>
     </div>
-  );
-}
-
-export default function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <Dashboard />
-      </ThemeProvider>
-    </QueryClientProvider>
   );
 }
