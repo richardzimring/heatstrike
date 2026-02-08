@@ -24,7 +24,6 @@ export const TRADIER_BASE_URL = 'https://sandbox.tradier.com/v1/markets';
 
 // Cache Configuration
 export const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
-export const TIMEZONE_OFFSET_MS = 5 * 60 * 60 * 1000; // 5 hours offset for timezone handling
 
 // Options Configuration
 export const MAX_EXPIRATION_DATES = 8;

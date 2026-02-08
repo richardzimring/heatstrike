@@ -85,6 +85,9 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.stage}-${self:service}-options-table
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
 
     TickersBucket:
       Type: AWS::S3::Bucket

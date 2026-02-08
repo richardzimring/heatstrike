@@ -6,9 +6,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import {
   OPTIONS_TABLE_NAME,
-  AWS_REGION,
   CACHE_TTL_MS,
-  TIMEZONE_OFFSET_MS,
   MAX_EXPIRATION_DATES,
 } from '../constants';
 import {
@@ -20,20 +18,64 @@ import { stringifyDates } from '../utils/index';
 import type { OptionsDataResponse, ErrorResponse } from '../schemas/options';
 
 // Initialize DynamoDB client
-const client = new DynamoDBClient({ region: AWS_REGION });
+const client = new DynamoDBClient();
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 /**
- * Check if cached data is still valid (within cache TTL)
+ * Get cache TTL based on market hours.
+ * During market hours (9:30 AM - 4:00 PM ET, weekdays): 1 hour
+ * Outside market hours: time until next market open
  */
-function isCacheValid(updatedAt: string): boolean {
-  const cacheTime = new Date(updatedAt).getTime() - TIMEZONE_OFFSET_MS;
-  const now = Date.now();
-  return cacheTime > now - CACHE_TTL_MS;
+function getCacheTTL(): number {
+  // Market Hours (Eastern Time)
+  const MARKET_OPEN_HOUR = 9;
+  const MARKET_OPEN_MINUTE = 30;
+  const MARKET_CLOSE_HOUR = 16;
+  const MARKET_CLOSE_MINUTE = 0;
+
+  const now = new Date();
+  const eastern = new Date(
+    now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
+  );
+  const day = eastern.getDay(); // 0 = Sunday, 6 = Saturday
+  const hours = eastern.getHours();
+  const minutes = eastern.getMinutes();
+  const currentMinutes = hours * 60 + minutes;
+
+  const marketOpen = MARKET_OPEN_HOUR * 60 + MARKET_OPEN_MINUTE; // 9:30 = 570
+  const marketClose = MARKET_CLOSE_HOUR * 60 + MARKET_CLOSE_MINUTE; // 16:00 = 960
+
+  const isWeekday = day >= 1 && day <= 5;
+  const isDuringMarketHours =
+    currentMinutes >= marketOpen && currentMinutes < marketClose;
+
+  if (isWeekday && isDuringMarketHours) {
+    return CACHE_TTL_MS;
+  }
+
+  // Calculate time until next market open
+  let daysUntilOpen = 0;
+  if (day === 6) {
+    // Saturday -> Monday
+    daysUntilOpen = 2;
+  } else if (day === 0) {
+    // Sunday -> Monday
+    daysUntilOpen = 1;
+  } else if (currentMinutes >= marketClose) {
+    // After close on weekday -> next day (or Monday if Friday)
+    daysUntilOpen = day === 5 ? 3 : 1;
+  }
+  // Before open on weekday: daysUntilOpen stays 0
+
+  const nextOpen = new Date(eastern);
+  nextOpen.setDate(nextOpen.getDate() + daysUntilOpen);
+  nextOpen.setHours(MARKET_OPEN_HOUR, MARKET_OPEN_MINUTE, 0, 0);
+
+  return nextOpen.getTime() - eastern.getTime();
 }
 
 /**
- * Get options data from cache
+ * Get options data from cache if not expired
  */
 async function getCachedData(
   ticker: string,
@@ -45,7 +87,10 @@ async function getCachedData(
     }),
   );
 
-  if (Item && Item.updated_at && isCacheValid(Item.updated_at as string)) {
+  // Check if item exists and hasn't expired
+  // (DynamoDB TTL deletion can be delayed, so we check manually too)
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (Item && (!Item.ttl || (Item.ttl as number) > nowSeconds)) {
     console.log('Using cached data from DynamoDB');
     return Item as OptionsDataResponse | ErrorResponse;
   }
@@ -54,16 +99,17 @@ async function getCachedData(
 }
 
 /**
- * Save data to cache
+ * Save data to cache with TTL
  */
 async function saveToCache(
   data: OptionsDataResponse | ErrorResponse,
 ): Promise<void> {
-  console.log('Saving to DynamoDB cache');
+  const ttl = Math.floor((Date.now() + getCacheTTL()) / 1000);
+
   await ddbDocClient.send(
     new PutCommand({
       TableName: OPTIONS_TABLE_NAME,
-      Item: data,
+      Item: { ...data, ttl },
     }),
   );
 }
@@ -72,8 +118,6 @@ async function saveToCache(
  * Fetch fresh options data from Tradier API
  */
 async function fetchFreshData(ticker: string): Promise<OptionsDataResponse> {
-  console.log('Fetching fresh data from Tradier API');
-
   // Fetch expiration dates and quote data concurrently
   const [allExpirationDates, stockData] = await Promise.all([
     fetchExpirationDates(ticker),
@@ -106,7 +150,7 @@ async function fetchFreshData(ticker: string): Promise<OptionsDataResponse> {
 function createErrorResponse(ticker: string, message: string): ErrorResponse {
   return {
     ticker,
-    updated_at: new Date(Date.now() + TIMEZONE_OFFSET_MS).toISOString(),
+    updated_at: new Date().toISOString(),
     message,
   };
 }
@@ -123,11 +167,13 @@ export async function getOptionsData(
   // Check cache first
   const cachedData = await getCachedData(ticker);
   if (cachedData) {
+    console.log('Using cached data from DynamoDB for ticker:', ticker);
     return cachedData;
   }
 
   try {
     // Fetch fresh data
+    console.log('Fetching fresh data from Tradier API for ticker:', ticker);
     const response = await fetchFreshData(ticker);
 
     await saveToCache(response);
