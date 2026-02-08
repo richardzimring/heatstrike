@@ -1,3 +1,3 @@
 export { optionsRouter } from './options';
-export { bugReportRouter } from './bugReport';
+export { feedbackRouter } from './feedback';
 export { tickersRouter } from './tickers';

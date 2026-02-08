@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://vk3egx5xz0.execute-api.us-east-2.amazonaws.com",
+      "url": "https://bcwqcc975a.execute-api.us-east-2.amazonaws.com",
       "description": "Production"
     },
     {
@@ -316,38 +316,47 @@
           "message"
         ]
       },
-      "BugReportSuccessResponse": {
+      "FeedbackSuccessResponse": {
         "type": "object",
         "properties": {
           "message": {
             "type": "string",
-            "example": "Bug report submitted successfully"
+            "example": "Feedback submitted successfully"
           }
         },
         "required": [
           "message"
         ]
       },
-      "BugReportErrorResponse": {
+      "FeedbackErrorResponse": {
         "type": "object",
         "properties": {
           "message": {
             "type": "string",
-            "example": "Failed to submit bug report"
+            "example": "Failed to submit feedback"
           }
         },
         "required": [
           "message"
         ]
       },
-      "BugReportRequest": {
+      "FeedbackRequest": {
         "type": "object",
         "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "bug",
+              "feature_request"
+            ],
+            "description": "Type of feedback: bug report or feature request",
+            "example": "bug"
+          },
           "description": {
             "type": "string",
             "minLength": 1,
             "maxLength": 2000,
-            "description": "Description of the bug",
+            "description": "Description of the feedback",
             "example": "The heatmap does not load for ticker XYZ"
           },
           "email": {
@@ -363,6 +372,7 @@
           }
         },
         "required": [
+          "type",
           "description"
         ]
       },
@@ -440,40 +450,40 @@
         }
       }
     },
-    "/bug-report": {
+    "/feedback": {
       "post": {
         "tags": [
-          "Bug Report"
+          "Feedback"
         ],
-        "summary": "Submit a bug report",
-        "description": "Sends a bug report email with the provided description and optional contact info.",
+        "summary": "Submit feedback",
+        "description": "Sends a feedback email (bug report or feature request) with the provided description and optional contact info.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BugReportRequest"
+                "$ref": "#/components/schemas/FeedbackRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Bug report submitted successfully",
+            "description": "Feedback submitted successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BugReportSuccessResponse"
+                  "$ref": "#/components/schemas/FeedbackSuccessResponse"
                 }
               }
             }
           },
           "500": {
-            "description": "Failed to submit bug report",
+            "description": "Failed to submit feedback",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BugReportErrorResponse"
+                  "$ref": "#/components/schemas/FeedbackErrorResponse"
                 }
               }
             }

@@ -58,7 +58,7 @@ functions:
           path: /openapi.json
           method: GET
       - httpApi:
-          path: /bug-report
+          path: /feedback
           method: POST
       - httpApi:
           path: /tickers

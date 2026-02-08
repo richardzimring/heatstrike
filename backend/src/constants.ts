@@ -30,6 +30,6 @@ export const TIMEZONE_OFFSET_MS = 5 * 60 * 60 * 1000; // 5 hours offset for time
 export const MAX_EXPIRATION_DATES = 8;
 export const STRIKE_RANGE = 5; // Number of strikes above/below current price
 
-// Bug Report Configuration
-export const BUG_REPORT_RECIPIENT = getEnvironmentVariable('BUG_REPORT_EMAIL');
-export const BUG_REPORT_SENDER = BUG_REPORT_RECIPIENT;
+// Feedback Configuration
+export const FEEDBACK_RECIPIENT = getEnvironmentVariable('BUG_REPORT_EMAIL');
+export const FEEDBACK_SENDER = FEEDBACK_RECIPIENT;

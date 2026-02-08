@@ -1,6 +1,6 @@
 import { Github } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
-import { BugReportDialog } from './BugReportDialog';
+import { FeedbackDialog } from './FeedbackDialog';
 import { Button } from '@/components/ui/button';
 import { TickerInput } from '@/components/controls/TickerInput';
 
@@ -47,7 +47,7 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
               <Github className="h-5 w-5" />
             </a>
           </Button>
-          <BugReportDialog />
+          <FeedbackDialog />
         </div>
       </div>
     </header>

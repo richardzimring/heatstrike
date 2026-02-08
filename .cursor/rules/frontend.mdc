@@ -54,6 +54,7 @@ App types are derived from the generated API types — see `types/index.ts`. Use
 
 - Feature folders under `components/` (controls, heatmap, layout)
 - shadcn/ui components in `components/ui/` — add new ones via the shadcn CLI, don't write by hand
+  - Always prefer installing/importing chadcn/ui components over creating custom implementations
 - Use `cn()` from `lib/utils` for conditional Tailwind classes
 - Props interfaces defined inline above the component
 

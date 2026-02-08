@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bug, Loader2, CheckCircle2 } from 'lucide-react';
+import { MessageSquarePlus, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,18 +13,21 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { postBugReport } from '@/lib/api/generated';
+import { postFeedback } from '@/lib/api/generated';
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
+type FeedbackType = 'bug' | 'feature_request';
 
-export function BugReportDialog() {
+export function FeedbackDialog() {
   const [open, setOpen] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<FeedbackType>('bug');
   const [description, setDescription] = useState('');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
   const resetForm = () => {
+    setFeedbackType('bug');
     setDescription('');
     setEmail('');
     setStatus('idle');
@@ -48,8 +51,9 @@ export function BugReportDialog() {
     setErrorMessage('');
 
     try {
-      const { error } = await postBugReport({
+      const { error } = await postFeedback({
         body: {
+          type: feedbackType,
           description: description.trim(),
           ...(email.trim() && { email: email.trim() }),
           userAgent: navigator.userAgent,
@@ -57,7 +61,7 @@ export function BugReportDialog() {
       });
 
       if (error) {
-        throw new Error(error.message || 'Failed to submit bug report');
+        throw new Error(error.message || 'Failed to submit feedback');
       }
 
       setStatus('success');
@@ -68,30 +72,34 @@ export function BugReportDialog() {
     } catch (err) {
       setStatus('error');
       setErrorMessage(
-        err instanceof Error ? err.message : 'Failed to submit bug report',
+        err instanceof Error ? err.message : 'Failed to submit feedback',
       );
     }
   };
 
+  const isBugReport = feedbackType === 'bug';
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Report a bug">
-          <Bug className="h-5 w-5" />
+        <Button variant="ghost" size="icon" aria-label="Send feedback">
+          <MessageSquarePlus className="h-5 w-5" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Report a Bug</DialogTitle>
+          <DialogTitle>Send Feedback</DialogTitle>
           <DialogDescription>
-            Describe the issue you encountered and we'll look into it.
+            Report a bug or request a new feature.
           </DialogDescription>
         </DialogHeader>
 
         {status === 'success' ? (
           <div className="flex flex-col items-center gap-2 py-6 text-center">
             <CheckCircle2 className="h-10 w-10 text-green-500" />
-            <p className="text-sm font-medium">Bug report submitted!</p>
+            <p className="text-sm font-medium">
+              {isBugReport ? 'Bug report' : 'Feature request'} submitted!
+            </p>
             <p className="text-xs text-muted-foreground">
               Thanks for helping us improve.
             </p>
@@ -99,12 +107,46 @@ export function BugReportDialog() {
         ) : (
           <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="bug-description">
+              <Label>Type</Label>
+              <div className="flex rounded-md border border-input bg-muted p-1">
+                <button
+                  type="button"
+                  onClick={() => setFeedbackType('bug')}
+                  className={`flex-1 rounded px-3 py-1.5 text-sm font-medium transition-colors ${
+                    feedbackType === 'bug'
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  disabled={status === 'submitting'}
+                >
+                  Bug Report
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFeedbackType('feature_request')}
+                  className={`flex-1 rounded px-3 py-1.5 text-sm font-medium transition-colors ${
+                    feedbackType === 'feature_request'
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  disabled={status === 'submitting'}
+                >
+                  Feature Request
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="feedback-description">
                 Description <span className="text-destructive">*</span>
               </Label>
               <Textarea
-                id="bug-description"
-                placeholder="What happened? What did you expect to happen?"
+                id="feedback-description"
+                placeholder={
+                  isBugReport
+                    ? 'What happened? What did you expect to happen?'
+                    : 'Describe the feature you would like to see.'
+                }
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
@@ -118,9 +160,9 @@ export function BugReportDialog() {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="bug-email">Email (optional)</Label>
+              <Label htmlFor="feedback-email">Email (optional)</Label>
               <Input
-                id="bug-email"
+                id="feedback-email"
                 type="email"
                 placeholder="your@email.com"
                 value={email}
@@ -147,7 +189,7 @@ export function BugReportDialog() {
                     Submitting...
                   </>
                 ) : (
-                  'Submit Report'
+                  'Submit'
                 )}
               </Button>
             </DialogFooter>
