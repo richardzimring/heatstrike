@@ -242,48 +242,63 @@ export function Heatmap({
   return (
     <div ref={containerRef} className="relative" onClick={handleBackgroundTap}>
       <svg width={width} height={height}>
+        <defs>
+          <clipPath id="heatmap-rounded-clip">
+            <rect
+              x={0}
+              y={0}
+              width={innerWidth}
+              height={innerHeight}
+              rx={12}
+              ry={12}
+            />
+          </clipPath>
+        </defs>
         <Group top={MARGIN.top} left={MARGIN.left}>
-          {/* Heatmap cells */}
-          {cells.map((cell) => {
-            // Don't render anything for non-existent options
-            if (cell.option === null) return null;
+          {/* Rounded clip around heatmap cells only */}
+          <g clipPath="url(#heatmap-rounded-clip)">
+            {/* Heatmap cells */}
+            {cells.map((cell) => {
+              // Don't render anything for non-existent options
+              if (cell.option === null) return null;
 
-            const x = xScale(cell.dateStr) ?? 0;
-            const y = yScale(cell.strike) ?? 0;
+              const x = xScale(cell.dateStr) ?? 0;
+              const y = yScale(cell.strike) ?? 0;
 
-            return (
-              <rect
-                key={`cell-${cell.dateIndex}-${cell.strikeIndex}`}
-                x={x}
-                y={y}
-                width={cellWidth}
-                height={cellHeight}
-                fill={
-                  cell.value !== null ? colorScale(cell.value) : 'transparent'
-                }
-                stroke={
-                  isMobile &&
-                  activeCellKey === `${cell.dateIndex}-${cell.strikeIndex}`
-                    ? 'hsl(var(--foreground))'
-                    : 'none'
-                }
-                strokeWidth={
-                  isMobile &&
-                  activeCellKey === `${cell.dateIndex}-${cell.strikeIndex}`
-                    ? 1.5
-                    : 0
-                }
-                className="cursor-pointer hover:brightness-90"
-                style={{
-                  transition:
-                    'fill 300ms ease-in-out, filter 150ms ease-in-out',
-                }}
-                onClick={(e) => handleCellClick(cell, e)}
-                onMouseMove={(e) => handleCellHover(cell, e)}
-                onMouseLeave={debouncedHideTooltip}
-              />
-            );
-          })}
+              return (
+                <rect
+                  key={`cell-${cell.dateIndex}-${cell.strikeIndex}`}
+                  x={x}
+                  y={y}
+                  width={cellWidth}
+                  height={cellHeight}
+                  fill={
+                    cell.value !== null ? colorScale(cell.value) : 'transparent'
+                  }
+                  stroke={
+                    isMobile &&
+                    activeCellKey === `${cell.dateIndex}-${cell.strikeIndex}`
+                      ? 'hsl(var(--foreground))'
+                      : 'none'
+                  }
+                  strokeWidth={
+                    isMobile &&
+                    activeCellKey === `${cell.dateIndex}-${cell.strikeIndex}`
+                      ? 1.5
+                      : 0
+                  }
+                  className="cursor-pointer hover:brightness-90"
+                  style={{
+                    transition:
+                      'fill 300ms ease-in-out, filter 150ms ease-in-out',
+                  }}
+                  onClick={(e) => handleCellClick(cell, e)}
+                  onMouseMove={(e) => handleCellHover(cell, e)}
+                  onMouseLeave={debouncedHideTooltip}
+                />
+              );
+            })}
+          </g>
 
           {/* Y Axis - Strike Prices (hidden on mobile) */}
           {!isMobile && (
