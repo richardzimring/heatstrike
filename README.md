@@ -8,9 +8,9 @@ Displays a 2D heatmap of options chain data — strikes on one axis, expiration 
 
 ## Architecture
 
-**Frontend** — React 19 + TypeScript SPA built with Vite. Uses [@visx](https://airbnb.io/visx/) for the heatmap visualization, [shadcn/ui](https://ui.shadcn.com/) for UI primitives, Tailwind CSS for styling, and TanStack Query for data fetching. The API client is auto-generated from the backend's OpenAPI spec. Hosted on GitHub Pages.
+**Frontend** — React 19 + TypeScript SPA built with Vite. Uses [@visx](https://airbnb.io/visx/) for the heatmap visualization, [shadcn/ui](https://ui.shadcn.com/) for UI primitives, Tailwind CSS for styling, and TanStack Query for data fetching. The API client is auto-generated with [HeyAPI](https://heyapi.dev/) from the backend's OpenAPI spec. Hosted on GitHub Pages.
 
-**Backend** — [Hono](https://hono.dev/) app running on AWS Lambda behind API Gateway. Fetches options and quote data from the [Tradier API](https://tradier.com/), caches responses in DynamoDB. A scheduled Lambda refreshes the valid ticker list daily from OCC and stores it in S3. Infrastructure is managed with Serverless Framework.
+**Backend** — [Hono](https://hono.dev/) app running on AWS Lambda behind API Gateway. Fetches options and quote data from the [Tradier API](https://tradier.com/), caches responses in DynamoDB. A scheduled Lambda refreshes the valid ticker list daily from [OCC](https://www.theocc.com/) and stores it in S3. Infrastructure is managed with [Serverless Framework](https://www.serverless.com/).
 
 ## Running Locally
 
