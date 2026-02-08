@@ -130,10 +130,7 @@ export async function getOptionsData(
     // Fetch fresh data
     const response = await fetchFreshData(ticker);
 
-    // Cache the response (don't await to avoid blocking response)
-    void saveToCache(response).catch((err) => {
-      console.error('Failed to cache options data:', err);
-    });
+    await saveToCache(response);
 
     return response;
   } catch (error) {
@@ -144,10 +141,7 @@ export async function getOptionsData(
 
     const errorResponse = createErrorResponse(ticker, errorMessage);
 
-    // Cache the error response
-    void saveToCache(errorResponse).catch((err) => {
-      console.error('Failed to cache error response:', err);
-    });
+    await saveToCache(errorResponse);
 
     return errorResponse;
   }
