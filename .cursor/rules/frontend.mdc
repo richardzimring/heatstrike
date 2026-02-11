@@ -74,9 +74,9 @@ App types are derived from the generated API types — see `types/index.ts`. Use
 
 ## Routing & Deep Linking
 
-TanStack Router provides file-based routing with deep linking support:
+TanStack Router provides file-based routing with deep linking support. Uses hash-based routing for GitHub Pages compatibility (no server-side rewrites needed):
 
-- **URL structure**: `/heatstrike/$ticker?direction=calls&metric=volume`
+- **URL structure**: `/heatstrike/#/AAPL?direction=calls&metric=volume`
 - **Path params**: ticker (e.g., `AAPL`)
 - **Search params**: `direction` (calls/puts), `metric` (volume, open_interest, etc.)
 - Routes are defined in `src/routes/` — the Vite plugin auto-generates `routeTree.gen.ts`

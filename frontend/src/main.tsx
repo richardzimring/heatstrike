@@ -1,14 +1,21 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
+import {
+  RouterProvider,
+  createRouter,
+  createHashHistory,
+} from '@tanstack/react-router';
 import { client } from '@/lib/api/generated/client.gen';
 import { routeTree } from './routeTree.gen';
 import './index.css';
 
+// Use hash history for GitHub Pages compatibility (no server-side rewrites)
+const hashHistory = createHashHistory();
+
 // Create the router instance
 const router = createRouter({
   routeTree,
-  basepath: '/heatstrike/',
+  history: hashHistory,
 });
 
 // Register the router for type safety
