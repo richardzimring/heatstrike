@@ -3,12 +3,14 @@ import {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   type KeyboardEvent,
 } from 'react';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTickers } from '@/hooks/useTickers';
+import { useRecentTickers } from '@/hooks/useRecentTickers';
 import type { TickerEntry } from '@/lib/api/generated';
 
 const MAX_RESULTS = 8;
@@ -53,6 +55,9 @@ function filterTickers(tickers: TickerEntry[], query: string): TickerEntry[] {
   );
 }
 
+/** Dropdown items: either search results or recent tickers */
+type DropdownMode = 'search' | 'recents';
+
 export function TickerInput({
   value,
   onChange,
@@ -68,8 +73,20 @@ export function TickerInput({
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const { data: tickers = [] } = useTickers();
+  const { recents, saveRecentTicker } = useRecentTickers(MAX_RESULTS);
 
-  const results = filterTickers(tickers, inputValue);
+  const searchResults = filterTickers(tickers, inputValue);
+
+  // Filter out the currently active ticker from recents
+  const filteredRecents = useMemo(
+    () => recents.filter((r) => r.t !== value),
+    [recents, value],
+  );
+
+  const hasQuery = inputValue.trim().length > 0;
+  const dropdownMode: DropdownMode = hasQuery ? 'search' : 'recents';
+  const results: { t: string; n: string }[] =
+    dropdownMode === 'search' ? searchResults : filteredRecents;
 
   // Sync internal state with prop value when it changes externally
   useEffect(() => {
@@ -87,21 +104,26 @@ export function TickerInput({
       setIsOpen(false);
       setHighlightedIndex(-1);
       onChange(ticker);
+
+      // Persist to recent tickers — look up company name from full list
+      const entry = tickers.find((e) => e.t === ticker);
+      saveRecentTicker(ticker, entry?.n ?? ticker);
     },
-    [onChange],
+    [onChange, tickers, saveRecentTicker],
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setInputValue(val);
-    setIsOpen(val.trim().length > 0);
+    // Show dropdown for search results OR recents (when empty)
+    setIsOpen(true);
     setHighlightedIndex(-1);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      if (!isOpen && inputValue.trim()) {
+      if (!isOpen) {
         setIsOpen(true);
         return;
       }
@@ -133,9 +155,7 @@ export function TickerInput({
   };
 
   const handleFocus = () => {
-    if (inputValue.trim()) {
-      setIsOpen(true);
-    }
+    setIsOpen(true);
   };
 
   const handleBlur = () => {
@@ -185,13 +205,18 @@ export function TickerInput({
           role="listbox"
           className="absolute top-full left-1/2 -translate-x-1/2 w-[280px] z-50 mt-1 max-h-[320px] overflow-y-auto rounded-md border bg-popover shadow-md"
         >
+          {dropdownMode === 'recents' && (
+            <div className="px-3 py-1.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider select-none">
+              Recent
+            </div>
+          )}
           {results.map((entry, index) => (
             <button
               key={entry.t}
               role="option"
               aria-selected={index === highlightedIndex}
               className={cn(
-                'flex w-full items-baseline gap-2 px-3 py-2 text-left text-sm cursor-pointer transition-colors',
+                'flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer transition-colors',
                 index === highlightedIndex
                   ? 'bg-accent text-accent-foreground'
                   : 'hover:bg-accent/50',
@@ -199,6 +224,9 @@ export function TickerInput({
               onMouseDown={() => handleItemMouseDown(entry.t)}
               onMouseEnter={() => setHighlightedIndex(index)}
             >
+              {dropdownMode === 'recents' && (
+                <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              )}
               <span className="font-semibold shrink-0">{entry.t}</span>
               <span className="text-muted-foreground truncate text-xs">
                 {entry.n}

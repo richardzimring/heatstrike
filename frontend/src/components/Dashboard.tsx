@@ -1,7 +1,10 @@
+import { useEffect } from 'react';
 import { useParams, useSearch, useNavigate } from '@tanstack/react-router';
 import { Header } from '@/components/layout/Header';
 import { HeatmapCard } from '@/components/heatmap/HeatmapCard';
 import { useOptionsData } from '@/hooks/useOptionsData';
+import { useTickers } from '@/hooks/useTickers';
+import { useRecentTickers } from '@/hooks/useRecentTickers';
 import type { Direction, Metric } from '@/types';
 
 export function Dashboard() {
@@ -9,7 +12,17 @@ export function Dashboard() {
   const { direction, metric } = useSearch({ from: '/$ticker' });
   const navigate = useNavigate();
 
-  const { data, isLoading, error } = useOptionsData(ticker);
+  const { data, isLoading, error, refetch } = useOptionsData(ticker);
+  const { data: tickers = [] } = useTickers();
+  const { saveRecentTicker } = useRecentTickers();
+
+  // Save the current ticker to recents on navigation / initial load
+  useEffect(() => {
+    if (ticker && tickers.length > 0) {
+      const entry = tickers.find((e) => e.t === ticker);
+      saveRecentTicker(ticker, entry?.n ?? ticker);
+    }
+  }, [ticker, tickers, saveRecentTicker]);
 
   const setTicker = (newTicker: string) => {
     navigate({
@@ -62,6 +75,7 @@ export function Dashboard() {
             setMetric={setMetric}
             isLoading={isLoading}
             error={error}
+            onRetry={() => refetch()}
           />
         </div>
       </main>
