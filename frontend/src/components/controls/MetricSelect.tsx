@@ -1,13 +1,6 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from '@/components/ui/select';
-import { METRIC_OPTIONS, type Metric } from '@/types';
+import type { Metric } from '@/types';
+import { METRIC_OPTIONS } from './constants';
+import { OptionsSelect } from './OptionsSelect';
 
 interface MetricSelectProps {
   value: Metric;
@@ -16,20 +9,12 @@ interface MetricSelectProps {
 
 export function MetricSelect({ value, onChange }: MetricSelectProps) {
   return (
-    <Select value={value} onValueChange={(v) => onChange(v as Metric)}>
-      <SelectTrigger size="sm" className="w-full sm:w-[150px]">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Metric</SelectLabel>
-          {METRIC_OPTIONS.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+    <OptionsSelect
+      value={value}
+      onChange={onChange}
+      options={METRIC_OPTIONS}
+      label="Metric"
+      triggerWidth="sm:w-[150px]"
+    />
   );
 }

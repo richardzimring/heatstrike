@@ -170,7 +170,7 @@ export function TickerInput({
         onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder="Ticker"
-        className="pl-9 h-9 w-[140px] bg-muted/50 focus:bg-background transition-colors border text-base sm:text-sm"
+        className="pl-9 h-9 w-[100px] bg-muted/50 focus:bg-background transition-colors border text-base sm:text-sm"
         disabled={isLoading}
         autoComplete="off"
         role="combobox"
@@ -183,7 +183,7 @@ export function TickerInput({
         <div
           ref={dropdownRef}
           role="listbox"
-          className="absolute top-full left-0 right-0 z-50 mt-1 max-h-[320px] overflow-y-auto rounded-md border bg-popover shadow-md"
+          className="absolute top-full left-1/2 -translate-x-1/2 w-[280px] z-50 mt-1 max-h-[320px] overflow-y-auto rounded-md border bg-popover shadow-md"
         >
           {results.map((entry, index) => (
             <button

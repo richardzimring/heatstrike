@@ -1,13 +1,6 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from '@/components/ui/select';
-import { DIRECTION_OPTIONS, type Direction } from '@/types';
+import type { Direction } from '@/types';
+import { DIRECTION_OPTIONS } from './constants';
+import { OptionsSelect } from './OptionsSelect';
 
 interface DirectionSelectProps {
   value: Direction;
@@ -16,20 +9,12 @@ interface DirectionSelectProps {
 
 export function DirectionSelect({ value, onChange }: DirectionSelectProps) {
   return (
-    <Select value={value} onValueChange={(v) => onChange(v as Direction)}>
-      <SelectTrigger size="sm" className="w-full sm:w-[90px]">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Direction</SelectLabel>
-          {DIRECTION_OPTIONS.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+    <OptionsSelect
+      value={value}
+      onChange={onChange}
+      options={DIRECTION_OPTIONS}
+      label="Direction"
+      triggerWidth="sm:w-[90px]"
+    />
   );
 }

@@ -22,8 +22,8 @@ interface HeatmapCardProps {
 function LoadingState() {
   return (
     <div className="flex flex-col flex-1 gap-4 min-h-0">
-      {/* Header skeleton - matches loaded header layout */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 shrink-0">
+      {/* Header skeleton - matches loaded header layout, px aligns with heatmap Y-axis on mobile */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 shrink-0 px-5 sm:px-0">
         {/* Left side - Stock info skeleton */}
         <div className="flex flex-col gap-1 w-full sm:w-auto">
           {/* Ticker */}
@@ -45,8 +45,8 @@ function LoadingState() {
       </div>
 
       {/* Card with spinner */}
-      <Card className="border-border flex-1 flex flex-col min-h-0">
-        <CardContent className="flex flex-1 items-center justify-center p-6 min-h-[300px]">
+      <Card className="border-0 bg-transparent shadow-none sm:border sm:border-border sm:bg-card sm:shadow-sm flex-1 flex flex-col min-h-0">
+        <CardContent className="flex flex-1 items-center justify-center p-2 sm:p-6 min-h-[300px]">
           <div className="flex flex-col items-center gap-3">
             <Spinner className="size-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
@@ -66,8 +66,8 @@ function LoadingState() {
 
 function ErrorState() {
   return (
-    <Card className="border-border">
-      <CardContent className="flex h-[500px] items-center justify-center p-6">
+    <Card className="border-0 bg-transparent shadow-none sm:border sm:border-border sm:bg-card sm:shadow-sm">
+      <CardContent className="flex h-[500px] items-center justify-center p-2 sm:p-6">
         <div className="flex flex-col items-center gap-3 text-center">
           <AlertCircle className="size-8 text-destructive" />
           <div className="flex flex-col gap-1">
@@ -84,8 +84,8 @@ function ErrorState() {
 
 function EmptyState() {
   return (
-    <Card className="border-border">
-      <CardContent className="flex h-[500px] items-center justify-center p-6">
+    <Card className="border-0 bg-transparent shadow-none sm:border sm:border-border sm:bg-card sm:shadow-sm">
+      <CardContent className="flex h-[500px] items-center justify-center p-2 sm:p-6">
         <p className="text-muted-foreground text-sm">
           Enter a ticker to view options data
         </p>
@@ -112,8 +112,8 @@ export function HeatmapCard({
 
   return (
     <div className="flex flex-col flex-1 gap-4 min-h-0">
-      {/* Header outside card */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 shrink-0">
+      {/* Header outside card — on mobile, px aligns with heatmap Y-axis (MARGIN_MOBILE.left/right) */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 shrink-0 px-5 sm:px-0">
         {/* Left side - Stock info */}
         <div className="flex flex-col gap-1">
           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -146,9 +146,9 @@ export function HeatmapCard({
         </div>
       </div>
 
-      {/* Card with heatmap */}
-      <Card className="border-border flex-1 flex flex-col min-h-0">
-        <CardContent className="p-2 sm:p-4 flex-1 flex flex-col min-h-0">
+      {/* Card with heatmap — visible on desktop, invisible on mobile */}
+      <Card className="border-0 bg-transparent shadow-none rounded-none sm:border sm:border-border sm:bg-card sm:shadow-sm sm:rounded-xl flex-1 flex flex-col min-h-0">
+        <CardContent className="p-0 sm:p-4 flex-1 flex flex-col min-h-0">
           <div className="relative flex-1 w-full min-h-[300px]">
             <div className="absolute inset-0">
               <ParentSize>

@@ -26,7 +26,16 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 relative">
+      {/* Ticker input centered on full screen width */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+        <TickerInput
+          value={ticker}
+          onChange={setTicker}
+          isLoading={isLoading}
+        />
+      </div>
+
       <div className="flex h-14 w-full max-w-6xl mx-auto items-center px-3 sm:px-6 gap-3 sm:gap-4">
         <button
           onClick={onReset}
@@ -43,17 +52,10 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
           </span>
         </button>
 
-        <div className="flex-1 max-w-sm">
-          <TickerInput
-            value={ticker}
-            onChange={setTicker}
-            isLoading={isLoading}
-            className="w-full"
-          />
-        </div>
+        <div className="flex-1" />
 
         {/* Desktop: inline buttons */}
-        <div className="hidden sm:flex flex-1 items-center justify-end gap-2">
+        <div className="hidden sm:flex items-center justify-end gap-2">
           <ThemeToggle />
           <InfoDialog />
           <FeedbackDialog />

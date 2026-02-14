@@ -1,14 +1,18 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { Group } from '@visx/group';
-import { scaleLinear, scaleBand } from '@visx/scale';
+import { scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import type { OptionsDataResponse, Direction, Metric, Option } from '@/types';
-
-const MARGIN_DESKTOP = { top: 10, right: 20, bottom: 55, left: 70 };
-const MARGIN_MOBILE = { top: 4, right: 4, bottom: 4, left: 4 };
+import type { OptionsDataResponse, Direction, Metric } from '@/types';
+import { MARGIN_DESKTOP, MARGIN_MOBILE } from './constants';
+import {
+  transformData,
+  buildNasdaqUrl,
+  createHeatmapColorScale,
+  type CellData,
+} from './utils';
 
 interface HeatmapProps {
   data: OptionsDataResponse;
@@ -18,53 +22,59 @@ interface HeatmapProps {
   height: number;
 }
 
-interface CellData {
-  strike: string;
-  strikeIndex: number;
-  date: string;
-  dateStr: string;
-  dateIndex: number;
-  value: number | null; // null = metric unavailable; number = real value (including 0)
-  option: Option | null; // null = option doesn't exist at this grid point
+const TOOLTIP_STYLE: React.CSSProperties = {
+  position: 'absolute',
+  backgroundColor: 'hsl(var(--popover) / 0.925)',
+  color: 'hsl(var(--popover-foreground))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '8px',
+  padding: '10px 14px',
+  fontSize: '13px',
+  boxShadow: '0 4px 12px -2px rgb(0 0 0 / 0.15)',
+  zIndex: 50,
+};
+
+function formatMetricLabel(metric: Metric): string {
+  return metric.charAt(0).toUpperCase() + metric.slice(1).replace('_', ' ');
 }
 
-function getMetricValue(option: Option, metric: Metric): number | null {
-  const raw = option[metric];
-  if (raw === null || raw === undefined || raw === '') return null;
-  return Math.abs(parseFloat(raw));
-}
-
-function transformData(
-  data: OptionsDataResponse,
-  direction: Direction,
-  metric: Metric,
-): { cells: CellData[]; maxValue: number } {
-  const cells: CellData[] = [];
-  let maxValue = 0;
-
-  data.options.forEach((optionChain, dateIndex) => {
-    const options =
-      direction === 'calls' ? optionChain.calls : optionChain.puts;
-
-    options.forEach((option, strikeIndex) => {
-      const value = option !== null ? getMetricValue(option, metric) : null;
-      if (value !== null) {
-        maxValue = Math.max(maxValue, value);
-      }
-
-      cells.push({
-        strike: data.strikes[strikeIndex] ?? '',
-        strikeIndex,
-        date: data.expirationDates[dateIndex] ?? '',
-        dateStr: data.expirationDatesStringified[dateIndex] ?? '',
-        dateIndex,
-        value,
-        option,
-      });
-    });
-  });
-
-  return { cells, maxValue };
+function HeatmapTooltip({
+  data,
+  metric,
+  top,
+  left,
+  offsetTop,
+  offsetLeft,
+}: {
+  data: CellData;
+  metric: Metric;
+  top?: number;
+  left?: number;
+  offsetTop: number;
+  offsetLeft: number;
+}) {
+  return (
+    <TooltipWithBounds
+      top={top}
+      left={left}
+      offsetTop={offsetTop}
+      offsetLeft={offsetLeft}
+      className="pointer-events-none"
+      style={TOOLTIP_STYLE}
+    >
+      <div className="space-y-1.5">
+        <div className="font-semibold text-sm">
+          {data.strike} &middot; {data.dateStr}
+        </div>
+        <div className="text-muted-foreground text-xs">
+          {formatMetricLabel(metric)}:{' '}
+          <span className="font-semibold text-foreground">
+            {data.value !== null ? data.value.toLocaleString() : 'N/A'}
+          </span>
+        </div>
+      </div>
+    </TooltipWithBounds>
+  );
 }
 
 export function Heatmap({
@@ -123,19 +133,8 @@ export function Heatmap({
   });
 
   // Color scale based on direction and theme
-  // In dark mode, zero is the dark background color; in light mode, zero is white
   const isDark = resolvedTheme === 'dark';
-  const colorScale = scaleLinear<string>({
-    domain: [0, maxValue || 1],
-    range:
-      direction === 'calls'
-        ? isDark
-          ? ['hsl(0, 0%, 3.9%)', 'hsl(142, 76%, 36%)'] // dark background to green
-          : ['hsl(0, 0%, 100%)', 'hsl(142, 76%, 36%)'] // white to green
-        : isDark
-          ? ['hsl(0, 0%, 3.9%)', 'hsl(0, 84%, 50%)'] // dark background to red
-          : ['hsl(0, 0%, 100%)', 'hsl(0, 84%, 50%)'], // white to red
-  });
+  const colorScale = createHeatmapColorScale(direction, isDark, maxValue);
 
   const cellWidth = xScale.bandwidth();
   const cellHeight = yScale.bandwidth();
@@ -163,18 +162,8 @@ export function Heatmap({
   }, [isMobile, activeCellKey, hideTooltip]);
 
   const navigateToNasdaq = (cell: CellData) => {
-    if (!cell.option) return;
-    const ticker = data.ticker;
-    const t = ticker.replace('/', '');
-    const baseUrl = 'https://www.nasdaq.com/market-activity/stocks';
-    const symbolID = `${'-'.repeat(4 - t.length)}${cell.option.symbol.substring(
-      t.length,
-    )}`;
-    const nasUrl = `${baseUrl}/${ticker.replace(
-      '/',
-      '.',
-    )}/option-chain/call-put-options/${t}--${symbolID}`;
-    window.open(nasUrl, '_blank');
+    const url = buildNasdaqUrl(data.ticker, cell.option);
+    if (url) window.open(url, '_blank');
   };
 
   const getRelativePosition = (e: React.MouseEvent) => {
@@ -242,22 +231,9 @@ export function Heatmap({
   return (
     <div ref={containerRef} className="relative" onClick={handleBackgroundTap}>
       <svg width={width} height={height}>
-        <defs>
-          <clipPath id="heatmap-rounded-clip">
-            <rect
-              x={0}
-              y={0}
-              width={innerWidth}
-              height={innerHeight}
-              rx={12}
-              ry={12}
-            />
-          </clipPath>
-        </defs>
         <Group top={MARGIN.top} left={MARGIN.left}>
-          {/* Rounded clip around heatmap cells only */}
-          <g clipPath="url(#heatmap-rounded-clip)">
-            {/* Heatmap cells */}
+          {/* Heatmap cells */}
+          <g>
             {cells.map((cell) => {
               // Don't render anything for non-existent options
               if (cell.option === null) return null;
@@ -300,7 +276,27 @@ export function Heatmap({
             })}
           </g>
 
-          {/* Y Axis - Strike Prices (hidden on mobile) */}
+          {/* Axis lines */}
+          <line
+            x1={0}
+            y1={0}
+            x2={0}
+            y2={innerHeight}
+            stroke="hsl(var(--muted-foreground))"
+            strokeOpacity={0.3}
+            strokeWidth={1}
+          />
+          <line
+            x1={0}
+            y1={innerHeight}
+            x2={innerWidth}
+            y2={innerHeight}
+            stroke="hsl(var(--muted-foreground))"
+            strokeOpacity={0.3}
+            strokeWidth={1}
+          />
+
+          {/* Y Axis - Strike Price tick labels (desktop only) */}
           {!isMobile && (
             <AxisLeft
               scale={yScale}
@@ -319,7 +315,7 @@ export function Heatmap({
             />
           )}
 
-          {/* X Axis - Expiration Dates (hidden on mobile) */}
+          {/* X Axis - Expiration Date tick labels (desktop only) */}
           {!isMobile && (
             <AxisBottom
               top={innerHeight}
@@ -339,78 +335,43 @@ export function Heatmap({
             />
           )}
 
-          {/* Axis Labels (hidden on mobile) */}
-          {!isMobile && (
-            <>
-              <text
-                x={-innerHeight / 2}
-                y={-60}
-                transform="rotate(-90)"
-                fill="currentColor"
-                fontSize={13}
-                fontWeight={500}
-                textAnchor="middle"
-                className="text-foreground"
-              >
-                Strike Price
-              </text>
-              <text
-                x={innerWidth / 2}
-                y={innerHeight + 50}
-                fill="currentColor"
-                fontSize={13}
-                fontWeight={500}
-                textAnchor="middle"
-                className="text-foreground"
-              >
-                Expiration Date
-              </text>
-            </>
-          )}
+          {/* Axis Titles */}
+          <text
+            x={-innerHeight / 2}
+            y={isMobile ? -12 : -60}
+            transform="rotate(-90)"
+            fill="currentColor"
+            fontSize={isMobile ? 11 : 13}
+            fontWeight={500}
+            textAnchor="middle"
+            className="text-foreground"
+          >
+            Strike Price
+          </text>
+          <text
+            x={innerWidth / 2}
+            y={innerHeight + (isMobile ? 18 : 50)}
+            fill="currentColor"
+            fontSize={isMobile ? 11 : 13}
+            fontWeight={500}
+            textAnchor="middle"
+            className="text-foreground"
+          >
+            Expiration Date
+          </text>
         </Group>
       </svg>
 
       {/* Tooltip */}
       {tooltipOpen && tooltipData && (
-        <TooltipWithBounds
+        <HeatmapTooltip
+          data={tooltipData}
+          metric={metric}
           top={tooltipTop}
           left={tooltipLeft}
           offsetTop={-Math.max(cellHeight * 0.15, 12)}
           offsetLeft={Math.max(cellWidth * 0.15, 12)}
-          className="pointer-events-none"
-          style={{
-            position: 'absolute',
-            backgroundColor: 'hsl(var(--popover) / 0.925)',
-            color: 'hsl(var(--popover-foreground))',
-            border: '1px solid hsl(var(--border))',
-            borderRadius: '8px',
-            padding: '10px 14px',
-            fontSize: '13px',
-            boxShadow: '0 4px 12px -2px rgb(0 0 0 / 0.15)',
-            zIndex: 50,
-          }}
-        >
-          <div className="space-y-1.5">
-            <div className="font-semibold text-sm">
-              {tooltipData.strike} &middot; {tooltipData.dateStr}
-            </div>
-            <div className="text-muted-foreground text-xs">
-              {metric.charAt(0).toUpperCase() +
-                metric.slice(1).replace('_', ' ')}
-              :{' '}
-              <span className="font-semibold text-foreground">
-                {tooltipData.value !== null
-                  ? tooltipData.value.toLocaleString()
-                  : 'N/A'}
-              </span>
-            </div>
-            {isMobile && (
-              <div className="text-muted-foreground text-[11px] pt-0.5">
-                Tap again to view details
-              </div>
-            )}
-          </div>
-        </TooltipWithBounds>
+        />
       )}
     </div>
   );
