@@ -1,11 +1,15 @@
+import { useMemo } from 'react';
 import { ParentSize } from '@visx/responsive';
 import { Heatmap } from './Heatmap';
+import { ColorScaleLegend } from './ColorScaleLegend';
+import { getMaxMetricValue } from './utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { formatRelativeTime } from '@/lib/utils';
 import type { OptionsDataResponse, Direction, Metric } from '@/types';
-import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { DirectionSelect } from '@/components/controls/DirectionSelect';
 import { MetricSelect } from '@/components/controls/MetricSelect';
 
@@ -17,6 +21,7 @@ interface HeatmapCardProps {
   setMetric: (metric: Metric) => void;
   isLoading: boolean;
   error: Error | null;
+  onRetry: () => void;
 }
 
 function LoadingState() {
@@ -64,7 +69,7 @@ function LoadingState() {
   );
 }
 
-function ErrorState() {
+function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <Card className="border-0 bg-transparent shadow-none sm:border sm:border-border sm:bg-card sm:shadow-sm">
       <CardContent className="flex h-[500px] items-center justify-center p-2 sm:p-6">
@@ -76,6 +81,10 @@ function ErrorState() {
               An unexpected error occurred. Please try again.
             </p>
           </div>
+          <Button variant="outline" size="sm" onClick={onRetry} className="mt-2">
+            <RefreshCw className="size-3.5" />
+            Try again
+          </Button>
         </div>
       </CardContent>
     </Card>
@@ -102,9 +111,15 @@ export function HeatmapCard({
   setMetric,
   isLoading,
   error,
+  onRetry,
 }: HeatmapCardProps) {
+  const maxValue = useMemo(
+    () => (data ? getMaxMetricValue(data, direction, metric) : 0),
+    [data, direction, metric],
+  );
+
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState />;
+  if (error) return <ErrorState onRetry={onRetry} />;
   if (!data) return <EmptyState />;
 
   const isPositiveChange = data.change_percentage.startsWith('+');
@@ -167,9 +182,16 @@ export function HeatmapCard({
         </CardContent>
       </Card>
 
-      {/* Updated time footnote */}
-      <div className="hidden sm:block text-xs text-muted-foreground text-right shrink-0">
-        Updated {formatRelativeTime(data.updated_at)}
+      {/* Footer: legend + updated time */}
+      <div className="hidden sm:flex items-center justify-between shrink-0">
+        <ColorScaleLegend
+          direction={direction}
+          maxValue={maxValue}
+          metric={metric}
+        />
+        <span className="text-xs text-muted-foreground">
+          Updated {formatRelativeTime(data.updated_at)}
+        </span>
       </div>
     </div>
   );

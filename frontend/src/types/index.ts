@@ -16,4 +16,5 @@ export type Metric = Extract<
   | 'vega'
   | 'rho'
   | 'phi'
+  | 'mid_iv'
 >;

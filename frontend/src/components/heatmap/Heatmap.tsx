@@ -28,14 +28,45 @@ const TOOLTIP_STYLE: React.CSSProperties = {
   color: 'hsl(var(--popover-foreground))',
   border: '1px solid hsl(var(--border))',
   borderRadius: '8px',
-  padding: '10px 14px',
-  fontSize: '13px',
+  padding: '8px 10px',
+  fontSize: '12px',
   boxShadow: '0 4px 12px -2px rgb(0 0 0 / 0.15)',
   zIndex: 50,
 };
 
 function formatMetricLabel(metric: Metric): string {
+  if (metric === 'mid_iv') return 'IV';
   return metric.charAt(0).toUpperCase() + metric.slice(1).replace('_', ' ');
+}
+
+function formatMetricValue(value: number, metric: Metric): string {
+  if (metric === 'mid_iv') return `${(value * 100).toFixed(1)}%`;
+  return value.toLocaleString();
+}
+
+/** Format a raw string field from the option for display, returning null if missing. */
+function formatOptionField(
+  raw: string | null | undefined,
+  kind: 'currency' | 'number' | 'iv',
+): string | null {
+  if (raw === null || raw === undefined || raw === '') return null;
+  const n = parseFloat(raw);
+  if (Number.isNaN(n)) return null;
+  if (kind === 'currency')
+    return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (kind === 'iv') return `${(n * 100).toFixed(1)}%`;
+  return n.toLocaleString();
+}
+
+/** Row inside the tooltip detail grid. */
+function TooltipRow({ label, value }: { label: string; value: string | null }) {
+  if (value === null) return null;
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-foreground">{value}</span>
+    </div>
+  );
 }
 
 function HeatmapTooltip({
@@ -53,6 +84,8 @@ function HeatmapTooltip({
   offsetTop: number;
   offsetLeft: number;
 }) {
+  const opt = data.option;
+
   return (
     <TooltipWithBounds
       top={top}
@@ -62,16 +95,66 @@ function HeatmapTooltip({
       className="pointer-events-none"
       style={TOOLTIP_STYLE}
     >
-      <div className="space-y-1.5">
-        <div className="font-semibold text-sm">
-          {data.strike} &middot; {data.dateStr}
+      <div className="space-y-1">
+        {/* Header: strike · date + symbol */}
+        <div>
+          <div className="font-semibold text-[13px]">
+            {data.strike} &middot; {data.dateStr}
+          </div>
+          {opt && (
+            <div className="text-[10px] text-muted-foreground font-mono">
+              {opt.symbol}
+            </div>
+          )}
         </div>
-        <div className="text-muted-foreground text-xs">
-          {formatMetricLabel(metric)}:{' '}
+
+        {/* Selected metric — highlighted */}
+        <div className="flex items-center justify-between gap-2 border-b border-border/50 pb-1 text-xs">
+          <span className="text-muted-foreground">
+            {formatMetricLabel(metric)}
+          </span>
           <span className="font-semibold text-foreground">
-            {data.value !== null ? data.value.toLocaleString() : 'N/A'}
+            {data.value !== null
+              ? formatMetricValue(data.value, metric)
+              : 'N/A'}
           </span>
         </div>
+
+        {/* Additional details */}
+        {opt && (
+          <div className="text-[11px] space-y-px">
+            {metric !== 'price' && (
+              <TooltipRow
+                label="Mid"
+                value={formatOptionField(opt.price, 'currency')}
+              />
+            )}
+            {metric !== 'spread' && (
+              <TooltipRow
+                label="Spread"
+                value={formatOptionField(opt.spread, 'currency')}
+              />
+            )}
+            {metric !== 'volume' && (
+              <TooltipRow
+                label="Vol"
+                value={formatOptionField(opt.volume, 'number')}
+              />
+            )}
+            {metric !== 'open_interest' && (
+              <TooltipRow
+                label="OI"
+                value={formatOptionField(opt.open_interest, 'number')}
+              />
+            )}
+            {metric !== 'mid_iv' && (
+              <TooltipRow
+                label="IV"
+                value={formatOptionField(opt.mid_iv, 'iv')}
+              />
+            )}
+          </div>
+        )}
       </div>
     </TooltipWithBounds>
   );

@@ -5,6 +5,7 @@ export const METRIC_OPTIONS: { value: Metric; label: string }[] = [
   { value: 'open_interest', label: 'Open Interest' },
   { value: 'price', label: 'Price' },
   { value: 'spread', label: 'Spread' },
+  { value: 'mid_iv', label: 'IV' },
   { value: 'delta', label: 'Delta' },
   { value: 'gamma', label: 'Gamma' },
   { value: 'theta', label: 'Theta' },
