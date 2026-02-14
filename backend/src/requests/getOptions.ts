@@ -80,6 +80,8 @@ export async function fetchOptionData(
           : option.volume
         ).toString(),
         open_interest: option.open_interest.toString(),
+        bid: bid !== null ? bid.toFixed(2) : null,
+        ask: ask !== null ? ask.toFixed(2) : null,
         price,
         spread,
         delta: option.greeks?.delta?.toFixed(6) ?? null,
@@ -88,6 +90,7 @@ export async function fetchOptionData(
         vega: option.greeks?.vega?.toFixed(6) ?? null,
         rho: option.greeks?.rho?.toFixed(6) ?? null,
         phi: option.greeks?.phi?.toFixed(6) ?? null,
+        mid_iv: option.greeks?.mid_iv?.toFixed(6) ?? null,
       };
     });
   });

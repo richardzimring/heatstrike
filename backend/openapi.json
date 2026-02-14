@@ -119,6 +119,16 @@
                         "type": "string",
                         "example": "5678"
                       },
+                      "bid": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "3.40"
+                      },
+                      "ask": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "3.50"
+                      },
                       "price": {
                         "type": "string",
                         "nullable": true,
@@ -158,6 +168,11 @@
                         "type": "string",
                         "nullable": true,
                         "example": "-0.034567"
+                      },
+                      "mid_iv": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.325000"
                       }
                     },
                     "required": [
@@ -168,6 +183,8 @@
                       "strike",
                       "volume",
                       "open_interest",
+                      "bid",
+                      "ask",
                       "price",
                       "spread",
                       "delta",
@@ -175,7 +192,8 @@
                       "theta",
                       "vega",
                       "rho",
-                      "phi"
+                      "phi",
+                      "mid_iv"
                     ]
                   }
                 },
@@ -213,6 +231,16 @@
                         "type": "string",
                         "example": "5678"
                       },
+                      "bid": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "3.40"
+                      },
+                      "ask": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "3.50"
+                      },
                       "price": {
                         "type": "string",
                         "nullable": true,
@@ -252,6 +280,11 @@
                         "type": "string",
                         "nullable": true,
                         "example": "-0.034567"
+                      },
+                      "mid_iv": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "0.325000"
                       }
                     },
                     "required": [
@@ -262,6 +295,8 @@
                       "strike",
                       "volume",
                       "open_interest",
+                      "bid",
+                      "ask",
                       "price",
                       "spread",
                       "delta",
@@ -269,7 +304,8 @@
                       "theta",
                       "vega",
                       "rho",
-                      "phi"
+                      "phi",
+                      "mid_iv"
                     ]
                   }
                 }

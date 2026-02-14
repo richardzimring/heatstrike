@@ -11,6 +11,9 @@ provider:
   region: us-east-2
   httpApi:
     cors: true
+    throttle:
+      burstLimit: 5
+      rateLimit: 1
   stage: ${opt:stage, 'dev'}
   logRetentionInDays: 7
   versionFunctions: false

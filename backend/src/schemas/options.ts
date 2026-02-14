@@ -30,6 +30,8 @@ export const OptionSchema = z.object({
   strike: z.string().openapi({ example: '185' }),
   volume: z.string().openapi({ example: '1234' }),
   open_interest: z.string().openapi({ example: '5678' }),
+  bid: z.string().nullable().openapi({ example: '3.40' }),
+  ask: z.string().nullable().openapi({ example: '3.50' }),
   price: z.string().nullable().openapi({ example: '3.45' }),
   spread: z.string().nullable().openapi({ example: '0.05' }),
   delta: z.string().nullable().openapi({ example: '0.523456' }),
@@ -38,6 +40,7 @@ export const OptionSchema = z.object({
   vega: z.string().nullable().openapi({ example: '0.234567' }),
   rho: z.string().nullable().openapi({ example: '0.056789' }),
   phi: z.string().nullable().openapi({ example: '-0.034567' }),
+  mid_iv: z.string().nullable().openapi({ example: '0.325000' }),
 });
 
 export const OptionChainSchema = z.object({
