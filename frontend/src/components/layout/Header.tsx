@@ -1,8 +1,17 @@
-import { Github } from 'lucide-react';
+import { useState } from 'react';
+import { Github, Menu, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { ThemeToggle } from './ThemeToggle';
 import { FeedbackDialog } from './FeedbackDialog';
 import { InfoDialog } from './InfoDialog';
 import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { TickerInput } from '@/components/controls/TickerInput';
 
 interface HeaderProps {
@@ -13,6 +22,9 @@ interface HeaderProps {
 }
 
 export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="flex h-14 w-full max-w-6xl mx-auto items-center px-3 sm:px-6 gap-3 sm:gap-4">
@@ -40,7 +52,8 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
           />
         </div>
 
-        <div className="flex flex-1 items-center justify-end gap-2">
+        {/* Desktop: inline buttons */}
+        <div className="hidden sm:flex flex-1 items-center justify-end gap-2">
           <ThemeToggle />
           <InfoDialog />
           <FeedbackDialog />
@@ -54,6 +67,54 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
               <Github className="h-5 w-5" />
             </a>
           </Button>
+        </div>
+
+        {/* Mobile: hamburger menu */}
+        <div className="flex sm:hidden items-center justify-end">
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-48">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-1 mt-4">
+                <Button
+                  variant="ghost"
+                  className="justify-start gap-3 h-11"
+                  onClick={() => {
+                    setTheme(theme === 'light' ? 'dark' : 'light');
+                  }}
+                >
+                  {theme === 'dark' ? (
+                    <Moon className="h-5 w-5" />
+                  ) : (
+                    <Sun className="h-5 w-5" />
+                  )}
+                  <span>Toggle theme</span>
+                </Button>
+                <InfoDialog triggerClassName="justify-start gap-3 h-11 w-full" triggerLabel="How it works" />
+                <FeedbackDialog triggerClassName="justify-start gap-3 h-11 w-full" triggerLabel="Send feedback" />
+                <Button
+                  variant="ghost"
+                  className="justify-start gap-3 h-11"
+                  asChild
+                >
+                  <a
+                    href="https://github.com/richardzimring/heatstrike"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="h-5 w-5" />
+                    <span>View on GitHub</span>
+                  </a>
+                </Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

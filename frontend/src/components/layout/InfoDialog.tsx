@@ -3,14 +3,25 @@ import { Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
-export function InfoDialog() {
+interface InfoDialogProps {
+  triggerClassName?: string;
+  triggerLabel?: string;
+}
+
+export function InfoDialog({ triggerClassName, triggerLabel }: InfoDialogProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="About Heatstrike">
+        <Button
+          variant="ghost"
+          size={triggerLabel ? 'default' : 'icon'}
+          aria-label="About Heatstrike"
+          className={triggerClassName}
+        >
           <Info className="h-5 w-5" />
+          {triggerLabel && <span>{triggerLabel}</span>}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg max-h-[50vh] overflow-y-auto">

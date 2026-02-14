@@ -18,7 +18,12 @@ import { postFeedback } from '@/lib/api/generated';
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 type FeedbackType = 'bug' | 'feature_request';
 
-export function FeedbackDialog() {
+interface FeedbackDialogProps {
+  triggerClassName?: string;
+  triggerLabel?: string;
+}
+
+export function FeedbackDialog({ triggerClassName, triggerLabel }: FeedbackDialogProps) {
   const [open, setOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState<FeedbackType>('bug');
   const [description, setDescription] = useState('');
@@ -82,8 +87,14 @@ export function FeedbackDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Send feedback">
+        <Button
+          variant="ghost"
+          size={triggerLabel ? 'default' : 'icon'}
+          aria-label="Send feedback"
+          className={triggerClassName}
+        >
           <MessageSquarePlus className="h-5 w-5" />
+          {triggerLabel && <span>{triggerLabel}</span>}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
