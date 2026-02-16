@@ -100,11 +100,11 @@ export function getHeatmapColorRange(
 ): [string, string] {
   if (direction === 'calls') {
     return isDark
-      ? ['hsl(0, 0%, 3.9%)', 'hsl(142, 76%, 36%)']
+      ? ['hsl(0, 0%, 0%)', 'hsl(142, 76%, 36%)']
       : ['hsl(0, 0%, 100%)', 'hsl(142, 76%, 36%)'];
   }
   return isDark
-    ? ['hsl(0, 0%, 3.9%)', 'hsl(0, 84%, 50%)']
+    ? ['hsl(0, 0%, 0%)', 'hsl(0, 84%, 50%)']
     : ['hsl(0, 0%, 100%)', 'hsl(0, 84%, 50%)'];
 }
 

@@ -26,7 +26,7 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 relative">
+    <header className="sticky top-0 z-50 w-full relative sm:border-b sm:bg-card">
       {/* Ticker input centered on full screen width */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
         <TickerInput
@@ -98,8 +98,14 @@ export function Header({ ticker, setTicker, isLoading, onReset }: HeaderProps) {
                   )}
                   <span>Toggle theme</span>
                 </Button>
-                <InfoDialog triggerClassName="justify-start gap-3 h-11 w-full" triggerLabel="How it works" />
-                <FeedbackDialog triggerClassName="justify-start gap-3 h-11 w-full" triggerLabel="Send feedback" />
+                <InfoDialog
+                  triggerClassName="justify-start gap-3 h-11 w-full"
+                  triggerLabel="How it works"
+                />
+                <FeedbackDialog
+                  triggerClassName="justify-start gap-3 h-11 w-full"
+                  triggerLabel="Send feedback"
+                />
                 <Button
                   variant="ghost"
                   className="justify-start gap-3 h-11"
