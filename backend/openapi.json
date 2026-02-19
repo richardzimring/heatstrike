@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://bcwqcc975a.execute-api.us-east-2.amazonaws.com",
+      "url": "https://api.heatstrike.rzimring.com",
       "description": "Production"
     },
     {
@@ -45,36 +45,21 @@
             "items": {
               "type": "string"
             },
-            "example": [
-              "2024-01-19",
-              "2024-01-26",
-              "2024-02-02"
-            ]
+            "example": ["2024-01-19", "2024-01-26", "2024-02-02"]
           },
           "expirationDatesStringified": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "example": [
-              "Jan 19",
-              "Jan 26",
-              "Feb 2"
-            ]
+            "example": ["Jan 19", "Jan 26", "Feb 2"]
           },
           "strikes": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "example": [
-              "$180",
-              "$181",
-              "$182",
-              "$183",
-              "$184",
-              "$185"
-            ]
+            "example": ["$180", "$181", "$182", "$183", "$184", "$185"]
           },
           "updated_at": {
             "type": "string",
@@ -310,10 +295,7 @@
                   }
                 }
               },
-              "required": [
-                "calls",
-                "puts"
-              ]
+              "required": ["calls", "puts"]
             }
           }
         },
@@ -346,11 +328,7 @@
             "example": "Invalid ticker"
           }
         },
-        "required": [
-          "ticker",
-          "updated_at",
-          "message"
-        ]
+        "required": ["ticker", "updated_at", "message"]
       },
       "FeedbackSuccessResponse": {
         "type": "object",
@@ -360,9 +338,7 @@
             "example": "Feedback submitted successfully"
           }
         },
-        "required": [
-          "message"
-        ]
+        "required": ["message"]
       },
       "FeedbackErrorResponse": {
         "type": "object",
@@ -372,19 +348,14 @@
             "example": "Failed to submit feedback"
           }
         },
-        "required": [
-          "message"
-        ]
+        "required": ["message"]
       },
       "FeedbackRequest": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
-            "enum": [
-              "bug",
-              "feature_request"
-            ],
+            "enum": ["bug", "feature_request"],
             "description": "Type of feedback: bug report or feature request",
             "example": "bug"
           },
@@ -407,10 +378,7 @@
             "example": "Mozilla/5.0 ..."
           }
         },
-        "required": [
-          "type",
-          "description"
-        ]
+        "required": ["type", "description"]
       },
       "TickerEntry": {
         "type": "object",
@@ -426,10 +394,7 @@
             "example": "Apple Inc"
           }
         },
-        "required": [
-          "t",
-          "n"
-        ]
+        "required": ["t", "n"]
       },
       "TickersResponse": {
         "type": "array",
@@ -443,9 +408,7 @@
   "paths": {
     "/data/{ticker}": {
       "get": {
-        "tags": [
-          "Options"
-        ],
+        "tags": ["Options"],
         "summary": "Get options chain data",
         "description": "Fetches options chain data for a given stock ticker, including expiration dates, strikes, and Greeks. Data is cached for 1 hour.",
         "parameters": [
@@ -488,9 +451,7 @@
     },
     "/feedback": {
       "post": {
-        "tags": [
-          "Feedback"
-        ],
+        "tags": ["Feedback"],
         "summary": "Submit feedback",
         "description": "Sends a feedback email (bug report or feature request) with the provided description and optional contact info.",
         "requestBody": {
@@ -529,9 +490,7 @@
     },
     "/tickers": {
       "get": {
-        "tags": [
-          "Tickers"
-        ],
+        "tags": ["Tickers"],
         "summary": "Get all valid tickers",
         "description": "Returns the full list of valid stock tickers and their company names. Data is refreshed daily from the OCC.",
         "responses": {

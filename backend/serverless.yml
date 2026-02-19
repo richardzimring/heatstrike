@@ -8,22 +8,25 @@ plugins:
 provider:
   name: aws
   runtime: nodejs24.x
-  region: us-east-2
+  region: us-east-1
   httpApi:
     cors: true
-    throttle:
-      burstLimit: 5
-      rateLimit: 1
   stage: ${opt:stage, 'dev'}
   logRetentionInDays: 7
   versionFunctions: false
+  domain:
+    name: api.heatstrike.rzimring.com
+    certificateArn: arn:aws:acm:us-east-1:496673558463:certificate/a7d513f0-049a-48b2-a544-c7f89fa6fdcc
+    createRoute53Record: false
+    apiType: http
+    endpointType: regional
   environment:
     OPTIONS_TABLE_NAME:
       Ref: OptionsTable
     TICKERS_BUCKET_NAME:
       Ref: TickersBucket
-    TRADIER_KEY: ${ssm:tradier-api-key}
-    BUG_REPORT_EMAIL: ${ssm:bug-report-email}
+    TRADIER_KEY: ${env:TRADIER_KEY}
+    BUG_REPORT_EMAIL: ${env:BUG_REPORT_EMAIL}
   iam:
     role:
       statements:
@@ -95,4 +98,4 @@ resources:
     TickersBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.stage}-${self:service}-tickers
+        BucketName: ${self:provider.stage}-${self:service}-${self:provider.region}-tickers

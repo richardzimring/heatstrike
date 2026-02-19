@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'frontend/**'
+      - "frontend/**"
   workflow_dispatch:
 
 permissions:
@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: https://bcwqcc975a.execute-api.us-east-2.amazonaws.com
+          VITE_API_URL: https://api.heatstrike.rzimring.com
 
       - uses: actions/upload-pages-artifact@v3
         with:

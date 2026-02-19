@@ -37,7 +37,7 @@ app.doc('/openapi.json', {
   },
   servers: [
     {
-      url: 'https://bcwqcc975a.execute-api.us-east-2.amazonaws.com',
+      url: 'https://api.heatstrike.rzimring.com',
       description: 'Production',
     },
     {

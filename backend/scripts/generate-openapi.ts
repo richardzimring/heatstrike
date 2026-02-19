@@ -24,7 +24,7 @@ const doc = app.getOpenAPIDocument({
   },
   servers: [
     {
-      url: 'https://bcwqcc975a.execute-api.us-east-2.amazonaws.com',
+      url: 'https://api.heatstrike.rzimring.com',
       description: 'Production',
     },
     {
@@ -40,6 +40,4 @@ fs.writeFileSync(outputPath, JSON.stringify(doc, null, 2));
 
 console.log(`OpenAPI spec generated successfully at ${outputPath}`);
 console.log(`Total paths: ${Object.keys(doc.paths ?? {}).length}`);
-console.log(
-  `Total schemas: ${Object.keys(doc.components?.schemas ?? {}).length}`,
-);
+console.log(`Total schemas: ${Object.keys(doc.components?.schemas ?? {}).length}`);
