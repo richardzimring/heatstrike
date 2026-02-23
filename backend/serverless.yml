@@ -4,6 +4,12 @@ service: heatstrike
 
 plugins:
   - serverless-offline
+  - serverless-api-gateway-throttling
+
+custom:
+  apiGatewayThrottling:
+    maxRequestsPerSecond: 50
+    maxConcurrentRequests: 100
 
 provider:
   name: aws
