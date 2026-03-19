@@ -22,6 +22,13 @@ export const TickerParamSchema = z.object({
 /**
  * Response schemas
  */
+export const ProcessingResponseSchema = z
+  .object({
+    status: z.literal('processing').openapi({ example: 'processing' }),
+    ticker: z.string().openapi({ example: 'AAPL' }),
+  })
+  .openapi('ProcessingResponse');
+
 export const OptionSchema = z.object({
   symbol: z.string().openapi({ example: 'AAPL' }),
   direction: z.string().openapi({ example: 'call' }),
@@ -66,6 +73,7 @@ export const OptionsDataResponseSchema = z
     }),
     updated_at: z.string().openapi({ example: '2024-01-15T14:30:00.000Z' }),
     options: z.array(OptionChainSchema),
+    earnings_date: z.string().nullable().openapi({ example: '2026-04-24' }),
   })
   .openapi('OptionsDataResponse');
 
@@ -82,3 +90,4 @@ export type Option = z.infer<typeof OptionSchema>;
 export type OptionChain = z.infer<typeof OptionChainSchema>;
 export type OptionsDataResponse = z.infer<typeof OptionsDataResponseSchema>;
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
+export type ProcessingResponse = z.infer<typeof ProcessingResponseSchema>;

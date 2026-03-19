@@ -1,32 +1,34 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
+import { compress } from 'hono/compress';
 import { logger } from 'hono/logger';
-import { optionsRouter, feedbackRouter, tickersRouter } from './routes/index';
+import {
+  optionsRouter,
+  feedbackRouter,
+  tickersRouter,
+  marketRouter,
+} from './routes/index';
 
-// Create main Hono app with OpenAPI support
 export const app = new OpenAPIHono();
 
-// Middleware
 app.use('*', cors());
+app.use('*', compress());
 app.use('*', logger());
 
-// Mount routes
 app.route('/', optionsRouter);
 app.route('/', feedbackRouter);
 app.route('/', tickersRouter);
+app.route('/', marketRouter);
 
-// 404 handler
 app.notFound((c) => {
   return c.json({ error: 'Not Found' }, 404);
 });
 
-// Error handler
 app.onError((err, c) => {
   console.error('Unhandled error:', err);
   return c.json({ error: 'Internal Server Error' }, 500);
 });
 
-// OpenAPI documentation endpoint (for development)
 app.doc('/openapi.json', {
   openapi: '3.0.0',
   info: {

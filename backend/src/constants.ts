@@ -24,10 +24,18 @@ export const TRADIER_BASE_URL = 'https://sandbox.tradier.com/v1/markets';
 
 // Cache Configuration
 export const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
+export const QUOTE_CACHE_TTL_MS = 60 * 1000; // 60 seconds for lightweight quote cache
+export const PROCESSING_LOCK_TTL_MS = 90 * 1000; // 90 seconds lock for in-flight fetches
 
 // Options Configuration
-export const MAX_EXPIRATION_DATES = 8;
-export const STRIKE_RANGE = 5; // Number of strikes above/below current price
+export const MAX_EXPIRATIONS = 20;
+export const TRADIER_CONCURRENCY = 5;
+
+// Home Page Default Tickers (pre-warmed by scheduled Lambda)
+export const DEFAULT_HOME_TICKERS = [
+  'SPY', 'QQQ', 'IWM', 'DIA',
+  'AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'META', 'GOOG', 'AMD',
+];
 
 // Feedback Configuration
 export const FEEDBACK_RECIPIENT = getEnvironmentVariable('BUG_REPORT_EMAIL');

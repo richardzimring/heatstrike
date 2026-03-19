@@ -2,24 +2,21 @@ import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import {
   TickerParamSchema,
   OptionsDataResponseSchema,
+  ProcessingResponseSchema,
   ErrorResponseSchema,
 } from '../schemas/options';
+import type { OptionsDataResponse } from '../schemas/options';
 import { getOptionsData } from '../services/index';
 
-// Create router for options endpoints
 export const optionsRouter = new OpenAPIHono();
 
-/**
- * GET /data/{ticker}
- * Fetch options chain data for a stock ticker
- */
 const getOptionsRoute = createRoute({
   method: 'get',
   path: '/data/{ticker}',
   tags: ['Options'],
   summary: 'Get options chain data',
   description:
-    'Fetches options chain data for a given stock ticker, including expiration dates, strikes, and Greeks. Data is cached for 1 hour.',
+    'Fetches the full options chain for a ticker (all expirations and strikes). Returns 202 while data is being fetched for the first time.',
   request: {
     params: TickerParamSchema,
   },
@@ -31,6 +28,14 @@ const getOptionsRoute = createRoute({
         },
       },
       description: 'Options data retrieved successfully',
+    },
+    202: {
+      content: {
+        'application/json': {
+          schema: ProcessingResponseSchema,
+        },
+      },
+      description: 'Data is being fetched — poll again shortly',
     },
     400: {
       content: {
@@ -48,15 +53,21 @@ optionsRouter.openapi(getOptionsRoute, async (c) => {
 
   const result = await getOptionsData(ticker);
 
-  // Check if response is an error
+  if ('status' in result && result.status === 'processing') {
+    return c.json({ status: result.status, ticker: result.ticker }, 202);
+  }
+
   if ('message' in result) {
-    // Log the detailed error for observability, return generic message to client
     console.error(`Options error for ${ticker}:`, result.message);
     return c.json(
-      { ...result, message: 'An unexpected error occurred. Please try again.' },
+      {
+        ticker: result.ticker,
+        updated_at: result.updated_at,
+        message: 'An unexpected error occurred. Please try again.',
+      },
       400,
     );
   }
 
-  return c.json(result, 200);
+  return c.json(result as OptionsDataResponse, 200);
 });

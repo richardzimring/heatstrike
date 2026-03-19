@@ -13,7 +13,7 @@ export interface RecentTicker {
 // when the list changes (even across tabs via the "storage" event).
 // ---------------------------------------------------------------------------
 
-let listeners: Array<() => void> = [];
+let listeners: (() => void)[] = [];
 
 function subscribe(cb: () => void) {
   listeners = [...listeners, cb];

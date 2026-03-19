@@ -108,10 +108,12 @@ export const TradierQuoteSchema = z.object({
 
 export type TradierQuote = z.infer<typeof TradierQuoteSchema>;
 
-// Quotes response
+// Quotes response -- Tradier returns a single object for 1 symbol, an array for multiple
 export const TradierQuotesResponseSchema = z.object({
   quotes: z.object({
-    quote: TradierQuoteSchema.optional(),
+    quote: z
+      .union([TradierQuoteSchema, z.array(TradierQuoteSchema)])
+      .optional(),
     unmatched_symbols: z
       .union([z.array(z.string()), z.object({ symbol: z.string() })])
       .optional(),
