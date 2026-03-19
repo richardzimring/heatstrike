@@ -45,21 +45,36 @@
             "items": {
               "type": "string"
             },
-            "example": ["2024-01-19", "2024-01-26", "2024-02-02"]
+            "example": [
+              "2024-01-19",
+              "2024-01-26",
+              "2024-02-02"
+            ]
           },
           "expirationDatesStringified": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "example": ["Jan 19", "Jan 26", "Feb 2"]
+            "example": [
+              "Jan 19",
+              "Jan 26",
+              "Feb 2"
+            ]
           },
           "strikes": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "example": ["$180", "$181", "$182", "$183", "$184", "$185"]
+            "example": [
+              "$180",
+              "$181",
+              "$182",
+              "$183",
+              "$184",
+              "$185"
+            ]
           },
           "updated_at": {
             "type": "string",
@@ -295,8 +310,16 @@
                   }
                 }
               },
-              "required": ["calls", "puts"]
+              "required": [
+                "calls",
+                "puts"
+              ]
             }
+          },
+          "earnings_date": {
+            "type": "string",
+            "nullable": true,
+            "example": "2026-04-24"
           }
         },
         "required": [
@@ -309,7 +332,28 @@
           "expirationDatesStringified",
           "strikes",
           "updated_at",
-          "options"
+          "options",
+          "earnings_date"
+        ]
+      },
+      "ProcessingResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "processing"
+            ],
+            "example": "processing"
+          },
+          "ticker": {
+            "type": "string",
+            "example": "AAPL"
+          }
+        },
+        "required": [
+          "status",
+          "ticker"
         ]
       },
       "ErrorResponse": {
@@ -328,7 +372,11 @@
             "example": "Invalid ticker"
           }
         },
-        "required": ["ticker", "updated_at", "message"]
+        "required": [
+          "ticker",
+          "updated_at",
+          "message"
+        ]
       },
       "FeedbackSuccessResponse": {
         "type": "object",
@@ -338,7 +386,9 @@
             "example": "Feedback submitted successfully"
           }
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "FeedbackErrorResponse": {
         "type": "object",
@@ -348,14 +398,19 @@
             "example": "Failed to submit feedback"
           }
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "FeedbackRequest": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["bug", "feature_request"],
+            "enum": [
+              "bug",
+              "feature_request"
+            ],
             "description": "Type of feedback: bug report or feature request",
             "example": "bug"
           },
@@ -378,7 +433,10 @@
             "example": "Mozilla/5.0 ..."
           }
         },
-        "required": ["type", "description"]
+        "required": [
+          "type",
+          "description"
+        ]
       },
       "TickerEntry": {
         "type": "object",
@@ -394,12 +452,102 @@
             "example": "Apple Inc"
           }
         },
-        "required": ["t", "n"]
+        "required": [
+          "t",
+          "n"
+        ]
       },
       "TickersResponse": {
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/TickerEntry"
+        }
+      },
+      "QuoteSummary": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "example": "AAPL"
+          },
+          "description": {
+            "type": "string",
+            "example": "Apple Inc"
+          },
+          "price": {
+            "type": "string",
+            "example": "213.25"
+          },
+          "change": {
+            "type": "string",
+            "example": "+1.23"
+          },
+          "change_percentage": {
+            "type": "string",
+            "example": "+0.58"
+          },
+          "volume": {
+            "type": "number",
+            "example": 47994892
+          },
+          "average_volume": {
+            "type": "number",
+            "example": 50967638
+          },
+          "week_52_high": {
+            "type": "number",
+            "example": 277.32
+          },
+          "week_52_low": {
+            "type": "number",
+            "example": 169.21
+          },
+          "prev_close": {
+            "type": "number",
+            "example": 212.02
+          },
+          "open": {
+            "type": "number",
+            "nullable": true,
+            "example": 213
+          },
+          "high": {
+            "type": "number",
+            "nullable": true,
+            "example": 215.3
+          },
+          "low": {
+            "type": "number",
+            "nullable": true,
+            "example": 211.8
+          },
+          "earnings_date": {
+            "type": "string",
+            "nullable": true,
+            "example": "2026-04-24"
+          }
+        },
+        "required": [
+          "ticker",
+          "description",
+          "price",
+          "change",
+          "change_percentage",
+          "volume",
+          "average_volume",
+          "week_52_high",
+          "week_52_low",
+          "prev_close",
+          "open",
+          "high",
+          "low",
+          "earnings_date"
+        ]
+      },
+      "QuotesResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/QuoteSummary"
         }
       }
     },
@@ -408,9 +556,11 @@
   "paths": {
     "/data/{ticker}": {
       "get": {
-        "tags": ["Options"],
+        "tags": [
+          "Options"
+        ],
         "summary": "Get options chain data",
-        "description": "Fetches options chain data for a given stock ticker, including expiration dates, strikes, and Greeks. Data is cached for 1 hour.",
+        "description": "Fetches the full options chain for a ticker (all expirations and strikes). Returns 202 while data is being fetched for the first time.",
         "parameters": [
           {
             "schema": {
@@ -436,6 +586,16 @@
               }
             }
           },
+          "202": {
+            "description": "Data is being fetched — poll again shortly",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessingResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Invalid ticker or API error",
             "content": {
@@ -451,7 +611,9 @@
     },
     "/feedback": {
       "post": {
-        "tags": ["Feedback"],
+        "tags": [
+          "Feedback"
+        ],
         "summary": "Submit feedback",
         "description": "Sends a feedback email (bug report or feature request) with the provided description and optional contact info.",
         "requestBody": {
@@ -490,7 +652,9 @@
     },
     "/tickers": {
       "get": {
-        "tags": ["Tickers"],
+        "tags": [
+          "Tickers"
+        ],
         "summary": "Get all valid tickers",
         "description": "Returns the full list of valid stock tickers and their company names. Data is refreshed daily from the OCC.",
         "responses": {
@@ -510,6 +674,57 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TickersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market/quotes": {
+      "get": {
+        "tags": [
+          "Market"
+        ],
+        "summary": "Get batch stock quotes",
+        "description": "Returns lightweight quote summaries for the requested tickers. Reads from DynamoDB cache first, falls back to Tradier batch quotes for misses.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated ticker symbols (max 30)",
+              "example": "SPY,QQQ,AAPL,TSLA"
+            },
+            "required": true,
+            "name": "tickers",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of quote summaries in the same order as requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
                 }
               }
             }

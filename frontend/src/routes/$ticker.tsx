@@ -1,16 +1,51 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Dashboard } from '@/components/Dashboard';
-import type { Direction, Metric } from '@/types';
+import { z } from 'zod';
+import { ExplorerDashboard } from '@/components/explorer/explorer-dashboard';
 
-interface SearchParams {
-  direction: Direction;
-  metric: Metric;
-}
+const explorerSearchSchema = z.object({
+  direction: z.enum(['calls', 'puts']).catch('calls'),
+  metric: z
+    .enum([
+      'volume',
+      'open_interest',
+      'vol_oi_ratio',
+      'price',
+      'spread',
+      'mid_iv',
+      'delta',
+      'gamma',
+      'theta',
+      'vega',
+      'rho',
+      'phi',
+    ])
+    .catch('volume'),
+  strikeRange: z.coerce.number().min(1).int().catch(5),
+  expirations: z.coerce.number().min(1).int().catch(8),
+  sizeMetric: z
+    .enum([
+      'none',
+      'volume',
+      'open_interest',
+      'vol_oi_ratio',
+      'price',
+      'spread',
+      'mid_iv',
+      'delta',
+      'gamma',
+      'theta',
+      'vega',
+      'rho',
+      'phi',
+    ])
+    .catch('none'),
+});
 
 export const Route = createFileRoute('/$ticker')({
-  validateSearch: (search): SearchParams => ({
-    direction: (search.direction as Direction) || 'calls',
-    metric: (search.metric as Metric) || 'volume',
-  }),
-  component: Dashboard,
+  validateSearch: explorerSearchSchema,
+  component: ExplorerPage,
 });
+
+function ExplorerPage() {
+  return <ExplorerDashboard />;
+}

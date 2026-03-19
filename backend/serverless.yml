@@ -4,12 +4,12 @@ service: heatstrike
 
 plugins:
   - serverless-offline
-  - serverless-api-gateway-throttling
+#   - serverless-api-gateway-throttling
 
-custom:
-  apiGatewayThrottling:
-    maxRequestsPerSecond: 50
-    maxConcurrentRequests: 100
+# custom:
+#   apiGatewayThrottling:
+#     maxRequestsPerSecond: 50
+#     maxConcurrentRequests: 100
 
 provider:
   name: aws
@@ -33,6 +33,7 @@ provider:
       Ref: TickersBucket
     TRADIER_KEY: ${env:TRADIER_KEY}
     BUG_REPORT_EMAIL: ${env:BUG_REPORT_EMAIL}
+    FMP_API_KEY: ${env:FMP_API_KEY, ''}
   iam:
     role:
       statements:
@@ -40,6 +41,8 @@ provider:
           Action:
             - dynamodb:GetItem
             - dynamodb:PutItem
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
           Resource:
             - Fn::GetAtt: [OptionsTable, Arn]
         - Effect: Allow
@@ -67,6 +70,9 @@ functions:
           path: /data/{ticker}
           method: GET
       - httpApi:
+          path: /market/quotes
+          method: GET
+      - httpApi:
           path: /openapi.json
           method: GET
       - httpApi:
@@ -75,6 +81,14 @@ functions:
       - httpApi:
           path: /tickers
           method: GET
+
+  WarmDefaultQuotes:
+    handler: lambdas/warmDefaultQuotes.handler
+    name: ${self:provider.stage}-${self:service}-warm-default-quotes
+    memorySize: 256
+    timeout: 15
+    events:
+      - schedule: rate(5 minutes)
 
   RefreshTickers:
     handler: lambdas/refreshTickers.handler
