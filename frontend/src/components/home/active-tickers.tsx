@@ -164,7 +164,7 @@ export function ActiveTickers({ quotesMap, isLoading }: ActiveTickersProps) {
       <CardHeader>
         <CardTitle>Popular Tickers</CardTitle>
         <CardDescription>
-          Price and activity for the most-watched stocks
+          Click any row to open the Options Explorer.
         </CardDescription>
       </CardHeader>
       <CardContent>

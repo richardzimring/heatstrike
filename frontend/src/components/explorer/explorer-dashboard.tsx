@@ -174,7 +174,7 @@ export function ExplorerDashboard() {
 
   if (isLoading || isProcessing) {
     return (
-      <div className="flex flex-col gap-6 p-4 md:p-6 md:h-[calc(100vh-3.5rem)]">
+      <div className="flex flex-col gap-6 p-4 md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
         <div className="flex flex-col gap-1 shrink-0">
           <Skeleton className="h-7 w-24" />
           <Skeleton className="h-6 w-32" />
@@ -226,7 +226,7 @@ export function ExplorerDashboard() {
 
   if (error || !data || !fullData || (rawData && 'message' in rawData)) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 p-4 md:p-6 md:h-[calc(100vh-3.5rem)]">
+      <div className="flex flex-col items-center justify-center gap-4 p-4 md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
         <p className="text-destructive font-medium">
           {error?.message ?? 'Failed to load data'}
         </p>
@@ -240,7 +240,7 @@ export function ExplorerDashboard() {
   const changeIsPositive = data.change.startsWith('+');
 
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6 md:h-[calc(100vh-3.5rem)]">
+    <div className="flex flex-col gap-6 p-4 md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
       {/* Ticker header */}
       <div className="flex flex-col gap-1 shrink-0">
         <div className="flex items-center gap-2">
@@ -290,13 +290,10 @@ export function ExplorerDashboard() {
       </div>
 
       {/* Stats row */}
-      <SummaryStats
-        data={fullData}
-        updatedAt={data.updated_at}
-      >
+      <SummaryStats data={fullData} updatedAt={data.updated_at}>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-1.5">
+            <Button size="sm" className="h-8 gap-1.5">
               <Lightbulb className="size-3.5" />
               <span className="hidden sm:inline">Insights</span>
             </Button>
@@ -309,50 +306,56 @@ export function ExplorerDashboard() {
 
       {/* Heatmap card with toolbar */}
       <Card className="flex-1 min-h-[350px] md:min-h-0 flex flex-col py-0 overflow-hidden">
-        <div className="flex items-center gap-3 flex-wrap px-4 py-3 border-b shrink-0">
-          <DirectionToggle
-            value={direction}
-            onChange={(v) => updateSearch({ direction: v })}
-          />
-          <Separator orientation="vertical" className="h-6 hidden sm:block" />
-          <MetricSelect
-            label="Color"
-            value={metric}
-            onChange={(v) => updateSearch({ metric: v })}
-          />
-          <SizeSelect
-            value={sizeMetric}
-            onChange={(v) => updateSearch({ sizeMetric: v })}
-          />
-          <Separator orientation="vertical" className="h-6 hidden sm:block" />
-          <RangeSliders
-            strikeRange={strikeRange}
-            expirations={expirations}
-            maxStrikeRange={maxStrikeRange}
-            maxExpirations={fullData?.expirationDates.length ?? 20}
-            onStrikeRangeChange={(v) => updateSearch({ strikeRange: v })}
-            onExpirationsChange={(v) => updateSearch({ expirations: v })}
-          />
-          {!isDefault && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="ml-auto h-8 gap-1.5 text-muted-foreground"
-              onClick={resetSearch}
-            >
-              <RotateCcw className="size-3.5" />
-              <span className="hidden sm:inline">Reset</span>
-            </Button>
-          )}
-          <InfoDialog className={isDefault ? 'ml-auto' : ''} />
+        <div className="overflow-x-auto overflow-y-hidden scrollbar-hidden px-4 py-3 border-b shrink-0">
+          <div className="flex w-max min-w-full items-center gap-3 pb-1 pr-1">
+            <DirectionToggle
+              value={direction}
+              onChange={(v) => updateSearch({ direction: v })}
+            />
+            <Separator orientation="vertical" className="h-6 hidden sm:block" />
+            <MetricSelect
+              label="Color"
+              value={metric}
+              onChange={(v) => updateSearch({ metric: v })}
+            />
+            <SizeSelect
+              value={sizeMetric}
+              onChange={(v) => updateSearch({ sizeMetric: v })}
+            />
+            <Separator orientation="vertical" className="h-6 hidden sm:block" />
+            <RangeSliders
+              strikeRange={strikeRange}
+              expirations={expirations}
+              maxStrikeRange={maxStrikeRange}
+              maxExpirations={fullData?.expirationDates.length ?? 20}
+              onStrikeRangeChange={(v) => updateSearch({ strikeRange: v })}
+              onExpirationsChange={(v) => updateSearch({ expirations: v })}
+            />
+            <div className="ml-auto flex items-center gap-2">
+              {!isDefault && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1.5 text-muted-foreground"
+                  onClick={resetSearch}
+                >
+                  <RotateCcw className="size-3.5" />
+                  <span className="hidden sm:inline">Reset</span>
+                </Button>
+              )}
+              <InfoDialog />
+            </div>
+          </div>
         </div>
-        <CardContent className="flex-1 min-h-0 p-2 md:p-3">
-          <HeatmapView
-            data={data}
-            direction={direction}
-            metric={metric}
-            sizeMetric={sizeMetric === 'none' ? null : sizeMetric}
-          />
+        <CardContent className="flex flex-1 min-h-0 p-2 md:p-3">
+          <div className="h-full w-full">
+            <HeatmapView
+              data={data}
+              direction={direction}
+              metric={metric}
+              sizeMetric={sizeMetric === 'none' ? null : sizeMetric}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

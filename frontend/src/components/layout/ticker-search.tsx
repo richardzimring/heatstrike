@@ -13,13 +13,15 @@ interface TickerEntry {
 
 interface TickerSearchProps {
   tickers: TickerEntry[];
+  currentTicker?: string;
 }
 
-export function TickerSearch({ tickers }: TickerSearchProps) {
+export function TickerSearch({ tickers, currentTicker }: TickerSearchProps) {
   const navigate = useNavigate();
   const { recents, saveRecentTicker } = useRecentTickers();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -49,10 +51,13 @@ export function TickerSearch({ tickers }: TickerSearchProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const displayValue = isFocused ? query : (currentTicker ?? '');
+
   const selectTicker = (ticker: string, name: string) => {
     saveRecentTicker(ticker, name);
     setQuery('');
     setIsOpen(false);
+    inputRef.current?.blur();
     navigate({
       to: '/$ticker',
       params: { ticker },
@@ -85,13 +90,18 @@ export function TickerSearch({ tickers }: TickerSearchProps) {
           ref={inputRef}
           type="text"
           placeholder="Search tickers..."
-          value={query}
+          value={displayValue}
           onChange={(e) => {
             setQuery(e.target.value);
             setHighlightIndex(-1);
             setIsOpen(true);
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            setIsFocused(true);
+            setQuery('');
+            setIsOpen(true);
+          }}
+          onBlur={() => setIsFocused(false)}
           onKeyDown={handleKeyDown}
           className="pl-9 h-9"
         />
