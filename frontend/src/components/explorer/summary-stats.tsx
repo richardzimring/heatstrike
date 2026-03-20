@@ -44,51 +44,48 @@ function StatBadge({
   );
 }
 
-export function SummaryStats({
-  data,
-  updatedAt,
-  children,
-}: SummaryStatsProps) {
+export function SummaryStats({ data, updatedAt, children }: SummaryStatsProps) {
   const totalVol =
     computeTotalVolume(data, 'calls') + computeTotalVolume(data, 'puts');
-  const totalOI =
-    computeTotalOI(data, 'calls') + computeTotalOI(data, 'puts');
+  const totalOI = computeTotalOI(data, 'calls') + computeTotalOI(data, 'puts');
   const pcr = computePutCallRatio(data);
   const maxPain = computeMaxPain(data);
   const impliedMove = computeImpliedMove(data);
 
   return (
     <TooltipProvider>
-      <div className="flex flex-wrap items-center gap-2 shrink-0">
-        <StatBadge
-          label="Total Volume"
-          value={totalVol.toLocaleString()}
-          tooltip="Calls + puts traded today"
-        />
-        <StatBadge
-          label="Total OI"
-          value={totalOI.toLocaleString()}
-          tooltip="All unsettled contracts"
-        />
-        <StatBadge
-          label="P/C Ratio"
-          value={pcr.byVolume !== null ? pcr.byVolume.toFixed(2) : 'N/A'}
-          tooltip="Put ÷ call volume"
-        />
-        <StatBadge
-          label="Max Pain"
-          value={maxPain ?? 'N/A'}
-          tooltip="Strike where most options expire worthless"
-        />
-        <StatBadge
-          label="Implied Move"
-          value={impliedMove !== null ? `±${impliedMove.toFixed(1)}%` : 'N/A'}
-          tooltip="Expected swing by nearest expiry"
-        />
-        <span className="text-xs text-muted-foreground">
-          Updated {formatRelativeTime(updatedAt)}
-        </span>
-        {children && <div className="ml-auto">{children}</div>}
+      <div className="shrink-0 overflow-x-auto overflow-y-hidden scrollbar-hidden">
+        <div className="flex w-max min-w-full items-center gap-2 pb-1 pr-1">
+          <StatBadge
+            label="Volume"
+            value={totalVol.toLocaleString()}
+            tooltip="Calls + puts traded today"
+          />
+          <StatBadge
+            label="OI"
+            value={totalOI.toLocaleString()}
+            tooltip="All unsettled contracts"
+          />
+          <StatBadge
+            label="P/C Ratio"
+            value={pcr.byVolume !== null ? pcr.byVolume.toFixed(2) : 'N/A'}
+            tooltip="Put ÷ call volume"
+          />
+          <StatBadge
+            label="Max Pain"
+            value={maxPain ?? 'N/A'}
+            tooltip="Strike where most options expire worthless"
+          />
+          <StatBadge
+            label="Implied Move"
+            value={impliedMove !== null ? `±${impliedMove.toFixed(1)}%` : 'N/A'}
+            tooltip="Expected swing by nearest expiry"
+          />
+          <span className="hidden sm:inline text-xs text-muted-foreground whitespace-nowrap">
+            Updated {formatRelativeTime(updatedAt)}
+          </span>
+          {children && <div className="ml-auto">{children}</div>}
+        </div>
       </div>
     </TooltipProvider>
   );

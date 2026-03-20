@@ -7,8 +7,18 @@ import { useQuotes } from '@/hooks/use-quotes';
 import { useWatchlist } from '@/hooks/use-watchlist';
 
 const DEFAULT_TICKERS = [
-  'SPY', 'QQQ', 'IWM', 'DIA',
-  'AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'META', 'GOOG', 'AMD',
+  'SPY',
+  'QQQ',
+  'IWM',
+  'DIA',
+  'AAPL',
+  'TSLA',
+  'NVDA',
+  'AMZN',
+  'MSFT',
+  'META',
+  'GOOG',
+  'AMD',
 ] as const;
 
 export const Route = createFileRoute('/')({
@@ -23,8 +33,9 @@ function HomePage() {
     return watchlistItems.map((w) => w.t).filter((t) => !defaults.has(t));
   }, [watchlistItems]);
 
-  const { quotesMap: defaultQuotesMap, isLoading: defaultsLoading } =
-    useQuotes([...DEFAULT_TICKERS]);
+  const { quotesMap: defaultQuotesMap, isLoading: defaultsLoading } = useQuotes(
+    [...DEFAULT_TICKERS],
+  );
   const { quotesMap: watchlistQuotesMap, isLoading: watchlistLoading } =
     useQuotes(watchlistOnlyTickers);
 
@@ -40,9 +51,8 @@ function HomePage() {
         <h1 className="text-2xl font-semibold tracking-tight">
           Market Overview
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Stock prices and trading volume across major indices and popular
-          tickers
+        <p className="mt-1 text-sm text-muted-foreground">
+          Click any card to open the Options Explorer.
         </p>
       </div>
 

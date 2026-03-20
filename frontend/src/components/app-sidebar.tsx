@@ -24,36 +24,38 @@ import {
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { useWatchlist } from '@/hooks/use-watchlist';
+import { useRecentTickers } from '@/hooks/useRecentTickers';
 
 export function AppSidebar() {
   const navigate = useNavigate();
   const params = useParams({ strict: false }) as { ticker?: string };
   const { tickers: watchlist, removeTicker } = useWatchlist();
+  const { recents } = useRecentTickers();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const currentTicker = params.ticker?.toUpperCase();
+  const lastTicker = recents[0]?.t ?? 'AAPL';
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              onClick={() => navigate({ to: '/' })}
-              className="cursor-pointer gap-3"
-            >
-              <img
-                src={`${import.meta.env.BASE_URL}logo.svg`}
-                alt="Heatstrike"
-                className="size-6 shrink-0"
-              />
-              <span className="font-semibold text-lg group-data-[collapsible=icon]:hidden">
-                Heatstrike
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <div className="flex items-center gap-3 rounded-[calc(var(--radius-sm)+2px)] p-2">
+          <button
+            type="button"
+            onClick={() => navigate({ to: '/' })}
+            className="inline-flex size-8 items-center justify-center rounded-md hover:bg-accent cursor-pointer"
+            aria-label="Go to home"
+          >
+            <img
+              src={`${import.meta.env.BASE_URL}logo.svg`}
+              alt="Heatstrike"
+              className="size-6 shrink-0"
+            />
+          </button>
+          <span className="font-semibold text-lg group-data-[collapsible=icon]:hidden">
+            Heatstrike
+          </span>
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -77,14 +79,14 @@ export function AppSidebar() {
                   onClick={() =>
                     navigate({
                       to: '/$ticker',
-                      params: { ticker: currentTicker ?? 'AAPL' },
+                      params: { ticker: currentTicker ?? lastTicker },
                       search: { direction: 'calls', metric: 'volume' },
                     })
                   }
-                  tooltip="Explorer"
+                  tooltip="Options Explorer"
                 >
                   <Grid3X3 />
-                  <span>Explorer</span>
+                  <span>Options Explorer</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

@@ -1,11 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { QuoteSummary } from '@/lib/api/generated';
@@ -43,7 +38,7 @@ function MarketCard({
 
   if (isLoading || !quote) {
     return (
-      <Card className="cursor-pointer transition-[transform] duration-200 hover:bg-accent/50 hover:-translate-y-0.5 hover:ring-foreground/20">
+      <Card className="cursor-pointer transition-colors hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]">
         <CardHeader className="pb-1">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             {LABELS[ticker] ?? ticker}
@@ -61,7 +56,7 @@ function MarketCard({
 
   return (
     <Card
-      className="cursor-pointer transition-[transform] duration-200 hover:bg-accent/50 hover:-translate-y-0.5 hover:ring-foreground/20"
+      className="cursor-pointer transition-colors hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]"
       onClick={() =>
         navigate({
           to: '/$ticker',
@@ -77,17 +72,17 @@ function MarketCard({
       </CardHeader>
       <CardContent>
         <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-semibold font-mono">
+          <span className="text-xl font-semibold font-mono">
             ${quote.price}
           </span>
           <Badge
             variant="secondary"
-            className={`gap-1 text-xs ${changeIsPositive ? 'text-emerald-500' : 'text-red-500'}`}
+            className={`gap-1 bg-background text-xs dark:bg-secondary ${changeIsPositive ? 'text-emerald-500' : 'text-red-500'}`}
           >
             {changeIsPositive ? (
-              <TrendingUp className="size-3" />
+              <TrendingUp className="hidden size-3 sm:inline-block" />
             ) : (
-              <TrendingDown className="size-3" />
+              <TrendingDown className="hidden size-3 sm:inline-block" />
             )}
             {quote.change_percentage}%
           </Badge>

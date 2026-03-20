@@ -1,12 +1,6 @@
 import { Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 interface InfoDialogProps {
@@ -27,9 +21,6 @@ export function InfoDialog({ className }: InfoDialogProps) {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg max-h-[60vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>About the Explorer</DialogTitle>
-        </DialogHeader>
         <div className="space-y-5 text-sm">
           <section>
             <h3 className="font-semibold mb-2">How It Works</h3>

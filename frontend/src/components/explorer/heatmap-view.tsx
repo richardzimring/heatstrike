@@ -17,7 +17,7 @@ import {
 } from './heatmap-utils';
 
 const MARGIN_DESKTOP = { top: 10, right: 10, bottom: 55, left: 76 };
-const MARGIN_MOBILE = { top: 5, right: 5, bottom: 25, left: 15 };
+const MARGIN_MOBILE = { top: 5, right: 5, bottom: 25, left: 18 };
 
 const TOOLTIP_STYLE: React.CSSProperties = {
   position: 'absolute',
@@ -297,7 +297,7 @@ function HeatmapInner({
 
           <text
             x={-innerHeight / 2}
-            y={isMobile ? -12 : -66}
+            y={isMobile ? -8 : -66}
             transform="rotate(-90)"
             fill="currentColor"
             fontSize={isMobile ? 11 : 13}
@@ -406,10 +406,16 @@ function HeatmapInner({
 
 export function HeatmapView(props: HeatmapViewProps) {
   return (
-    <ParentSize debounceTime={0}>
-      {({ width, height }) => (
-        <HeatmapInner {...props} width={width} height={Math.max(350, height)} />
-      )}
-    </ParentSize>
+    <div className="h-full w-full">
+      <ParentSize debounceTime={0}>
+        {({ width, height }) => (
+          <HeatmapInner
+            {...props}
+            width={width}
+            height={Math.max(350, height)}
+          />
+        )}
+      </ParentSize>
+    </div>
   );
 }

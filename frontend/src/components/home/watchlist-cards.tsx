@@ -39,7 +39,7 @@ function WatchlistCard({
 
   if (isLoading || !quote) {
     return (
-      <Card className="cursor-pointer transition-[transform] duration-200 hover:bg-accent/50 hover:-translate-y-0.5 hover:ring-foreground/20">
+      <Card className="cursor-pointer transition-colors hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]">
         <CardHeader className="pb-1">
           <CardTitle className="flex items-center gap-2">
             <Skeleton className="size-6 rounded-md" />
@@ -59,7 +59,7 @@ function WatchlistCard({
 
   return (
     <Card
-      className="cursor-pointer transition-[transform] duration-200 hover:bg-accent/50 hover:-translate-y-0.5 hover:ring-foreground/20"
+      className="cursor-pointer transition-colors hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]"
       onClick={() =>
         navigate({
           to: '/$ticker',
@@ -77,12 +77,12 @@ function WatchlistCard({
       </CardHeader>
       <CardContent>
         <div className="flex items-baseline gap-2">
-          <span className="text-lg font-semibold font-mono">
+          <span className="text-xl font-semibold font-mono">
             ${quote.price}
           </span>
           <Badge
             variant="secondary"
-            className={`gap-1 text-xs ${changeIsPositive ? 'text-emerald-500' : 'text-red-500'}`}
+            className={`gap-1 bg-background text-xs dark:bg-secondary ${changeIsPositive ? 'text-emerald-500' : 'text-red-500'}`}
           >
             {changeIsPositive ? (
               <TrendingUp className="size-3" />
