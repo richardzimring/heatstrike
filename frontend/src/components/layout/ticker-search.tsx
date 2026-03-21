@@ -103,7 +103,7 @@ export function TickerSearch({ tickers, currentTicker }: TickerSearchProps) {
           }}
           onBlur={() => setIsFocused(false)}
           onKeyDown={handleKeyDown}
-          className="pl-9 h-9"
+          className="pl-9 h-9 text-base md:text-sm"
         />
       </div>
 

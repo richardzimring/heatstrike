@@ -174,7 +174,7 @@ export function ExplorerDashboard() {
 
   if (isLoading || isProcessing) {
     return (
-      <div className="flex flex-col gap-6 p-4 md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
+      <div className="flex flex-col gap-6 px-4 pt-4 pb-[env(safe-area-inset-bottom)] md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
         <div className="flex flex-col gap-1 shrink-0">
           <Skeleton className="h-7 w-24" />
           <Skeleton className="h-6 w-32" />
@@ -192,8 +192,8 @@ export function ExplorerDashboard() {
           <Skeleton className="h-9 w-28 rounded-lg" />
           <Skeleton className="h-9 w-24 rounded-lg" />
           <Skeleton className="h-9 w-24 rounded-lg" />
-          <Skeleton className="h-9 w-24 rounded-lg" />
-          <Skeleton className="h-9 w-28 rounded-lg" />
+          <Skeleton className="hidden md:block h-9 w-24 rounded-lg" />
+          <Skeleton className="hidden md:block h-9 w-28 rounded-lg" />
         </div>
 
         <Card className="flex-1 min-h-[350px] md:min-h-0 flex flex-col py-0 overflow-hidden">
@@ -226,7 +226,7 @@ export function ExplorerDashboard() {
 
   if (error || !data || !fullData || (rawData && 'message' in rawData)) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 p-4 md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
+      <div className="flex flex-col items-center justify-center gap-4 px-4 pt-4 pb-[env(safe-area-inset-bottom)] md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
         <p className="text-destructive font-medium">
           {error?.message ?? 'Failed to load data'}
         </p>
@@ -240,7 +240,7 @@ export function ExplorerDashboard() {
   const changeIsPositive = data.change.startsWith('+');
 
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
+    <div className="flex flex-col gap-6 px-4 pt-4 pb-[env(safe-area-inset-bottom)] md:p-6 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-3.5rem)]">
       {/* Ticker header */}
       <div className="flex flex-col gap-1 shrink-0">
         <div className="flex items-center gap-2">

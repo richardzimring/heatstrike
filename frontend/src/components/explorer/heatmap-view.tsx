@@ -405,6 +405,8 @@ function HeatmapInner({
 }
 
 export function HeatmapView(props: HeatmapViewProps) {
+  const isMobile = useIsMobile();
+
   return (
     <div className="h-full w-full">
       <ParentSize debounceTime={0}>
@@ -412,7 +414,7 @@ export function HeatmapView(props: HeatmapViewProps) {
           <HeatmapInner
             {...props}
             width={width}
-            height={Math.max(350, height)}
+            height={isMobile ? Math.max(1, height) : Math.max(350, height)}
           />
         )}
       </ParentSize>
