@@ -18,3 +18,17 @@ export function formatRelativeTime(dateString: string): string {
   if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
   return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
 }
+
+export function parseCacheControlMaxAgeMs(
+  cacheControl: string | null | undefined,
+): number | null {
+  if (!cacheControl) return null;
+
+  const match = cacheControl.match(/(?:^|,)\s*max-age=(\d+)\s*(?:,|$)/i);
+  if (!match) return null;
+
+  const seconds = Number.parseInt(match[1], 10);
+  if (!Number.isFinite(seconds) || seconds < 0) return null;
+
+  return seconds * 1000;
+}
