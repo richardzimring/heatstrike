@@ -7,6 +7,8 @@ import {
 } from '../schemas/options';
 import type { OptionsDataResponse } from '../schemas/options';
 import { getOptionsData } from '../services/index';
+import { CACHE_TTL_MS } from '../constants';
+import { getOptionsCacheTtlMs } from '../utils/marketHours';
 
 export const optionsRouter = new OpenAPIHono();
 
@@ -54,11 +56,13 @@ optionsRouter.openapi(getOptionsRoute, async (c) => {
   const result = await getOptionsData(ticker);
 
   if ('status' in result && result.status === 'processing') {
+    c.header('Cache-Control', 'no-store');
     return c.json({ status: result.status, ticker: result.ticker }, 202);
   }
 
   if ('message' in result) {
     console.error(`Options error for ${ticker}:`, result.message);
+    c.header('Cache-Control', 'no-store');
     return c.json(
       {
         ticker: result.ticker,
@@ -69,5 +73,9 @@ optionsRouter.openapi(getOptionsRoute, async (c) => {
     );
   }
 
+  c.header(
+    'Cache-Control',
+    `public, max-age=${Math.floor(getOptionsCacheTtlMs(CACHE_TTL_MS) / 1000)}`,
+  );
   return c.json(result as OptionsDataResponse, 200);
 });

@@ -5,15 +5,32 @@ import type { TickersResponse } from '../schemas/tickers';
 import { TICKERS_BUCKET_NAME, CACHE_TTL_MS } from '../constants';
 
 const s3 = new S3Client({});
+const TICKERS_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
 // In-memory cache so we don't re-read S3 on every invocation within the same Lambda instance
 let cachedTickers: TickersResponse | null = null;
+let cachedTickersLastModifiedMs: number | null = null;
 let cacheTimestamp = 0;
 
-async function loadTickers(): Promise<TickersResponse> {
+function getTickersMaxAgeSeconds(lastModifiedMs: number): number {
+  const now = Date.now();
+  const nextRefreshMs = lastModifiedMs + TICKERS_REFRESH_INTERVAL_MS;
+  const remainingMs = Math.max(0, nextRefreshMs - now);
+  return Math.floor(remainingMs / 1000);
+}
+
+async function loadTickers(): Promise<{
+  tickers: TickersResponse;
+  maxAgeSeconds: number;
+}> {
   const now = Date.now();
   if (cachedTickers && now - cacheTimestamp < CACHE_TTL_MS) {
-    return cachedTickers;
+    return {
+      tickers: cachedTickers,
+      maxAgeSeconds: getTickersMaxAgeSeconds(
+        cachedTickersLastModifiedMs ?? cacheTimestamp,
+      ),
+    };
   }
 
   const result = await s3.send(
@@ -29,8 +46,12 @@ async function loadTickers(): Promise<TickersResponse> {
   }
 
   cachedTickers = JSON.parse(body) as TickersResponse;
+  cachedTickersLastModifiedMs = result.LastModified?.getTime() ?? now;
   cacheTimestamp = now;
-  return cachedTickers;
+  return {
+    tickers: cachedTickers,
+    maxAgeSeconds: getTickersMaxAgeSeconds(cachedTickersLastModifiedMs),
+  };
 }
 
 // Create router for tickers endpoint
@@ -69,8 +90,11 @@ const getTickersRoute = createRoute({
 
 tickersRouter.openapi(getTickersRoute, async (c) => {
   try {
-    const tickers = await loadTickers();
-    c.header('Cache-Control', 'public, max-age=3600');
+    const { tickers, maxAgeSeconds } = await loadTickers();
+    c.header(
+      'Cache-Control',
+      `public, max-age=${maxAgeSeconds}`,
+    );
     return c.json(tickers, 200);
   } catch (error) {
     console.error('Failed to load tickers:', error);

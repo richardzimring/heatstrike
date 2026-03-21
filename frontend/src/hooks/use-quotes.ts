@@ -2,9 +2,17 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getMarketQuotes } from '@/lib/api/generated';
 import type { QuoteSummary } from '@/lib/api/generated';
+import { parseCacheControlMaxAgeMs } from '@/lib/utils';
 
-async function fetchQuotes(tickers: string[]): Promise<QuoteSummary[]> {
-  const { data, error } = await getMarketQuotes({
+const DEFAULT_QUOTES_STALE_TIME_MS = 5 * 60 * 1000;
+
+interface QuotesQueryData {
+  quotes: QuoteSummary[];
+  staleTimeMs: number;
+}
+
+async function fetchQuotes(tickers: string[]): Promise<QuotesQueryData> {
+  const { data, error, response } = await getMarketQuotes({
     query: { tickers: tickers.join(',') },
   });
 
@@ -12,7 +20,14 @@ async function fetchQuotes(tickers: string[]): Promise<QuoteSummary[]> {
     throw new Error('Failed to fetch quotes');
   }
 
-  return data ?? [];
+  const staleTimeMs =
+    parseCacheControlMaxAgeMs(response?.headers.get('cache-control')) ??
+    DEFAULT_QUOTES_STALE_TIME_MS;
+
+  return {
+    quotes: data ?? [],
+    staleTimeMs,
+  };
 }
 
 export function useQuotes(tickers: string[]) {
@@ -23,17 +38,20 @@ export function useQuotes(tickers: string[]) {
     queryKey: ['quotes', key],
     queryFn: () => fetchQuotes(sorted),
     enabled: sorted.length > 0,
+    staleTime: (query) =>
+      query.state.data?.staleTimeMs ?? DEFAULT_QUOTES_STALE_TIME_MS,
   });
 
+  const quotes = query.data?.quotes;
   const quotesMap = useMemo(() => {
     const map = new Map<string, QuoteSummary>();
-    if (query.data) {
-      for (const quote of query.data) {
+    if (quotes) {
+      for (const quote of quotes) {
         map.set(quote.ticker, quote);
       }
     }
     return map;
-  }, [query.data]);
+  }, [quotes]);
 
-  return { ...query, quotesMap };
+  return { ...query, data: quotes, quotesMap };
 }

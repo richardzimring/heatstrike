@@ -91,6 +91,7 @@ marketRouter.openapi(getMarketQuotesRoute, async (c) => {
 
   try {
     const nowSeconds = Math.floor(Date.now() / 1000);
+    const quoteCacheTtlMs = getQuoteCacheTtlMs();
 
     // 1. BatchGetItem from DynamoDB for all requested tickers
     const cacheResult = await ddbDocClient.send(
@@ -121,7 +122,7 @@ marketRouter.openapi(getMarketQuotesRoute, async (c) => {
     const freshQuotes = new Map<string, Record<string, unknown>>();
     if (misses.length > 0) {
       const tradierQuotes = await fetchBatchQuotes(misses);
-      const ttl = Math.floor((Date.now() + getQuoteCacheTtlMs()) / 1000);
+      const ttl = Math.floor((Date.now() + quoteCacheTtlMs) / 1000);
 
       // 4. Write fresh quotes to DynamoDB cache
       const writeRequests = [...tradierQuotes.entries()].map(
@@ -235,7 +236,10 @@ marketRouter.openapi(getMarketQuotesRoute, async (c) => {
       ];
     });
 
-    c.header('Cache-Control', 'public, max-age=30');
+    c.header(
+      'Cache-Control',
+      `public, max-age=${Math.floor(quoteCacheTtlMs / 1000)}`,
+    );
     return c.json(response, 200);
   } catch (error) {
     console.error('Failed to fetch market quotes:', error);
