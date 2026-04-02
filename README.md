@@ -2,6 +2,10 @@
 
 An interactive stock options heatmap. Visualize volume, open interest, price, spread, and greeks for any ticker.
 
+**Live site**: [https://richardzimring.github.io/heatstrike](https://richardzimring.github.io/heatstrike)
+
+<img width="1512" height="827" alt="Screenshot 2026-04-01 at 11 38 13 PM" src="https://github.com/user-attachments/assets/e1f3dd40-1301-47d8-8132-b89ea6567a68" />
+
 ## What It Does
 
 Displays a 2D heatmap of options chain data — strikes on one axis, expiration dates on the other, color intensity driven by a user-selected metric. Users pick a ticker, toggle calls/puts, and choose from 10+ metrics (e.g. volume, open interest, price, spread, delta, gamma, theta, vega, rho, phi). Clicking a cell links out to the corresponding Nasdaq options contract page.
