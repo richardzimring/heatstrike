@@ -81,6 +81,9 @@ functions:
       - httpApi:
           path: /tickers
           method: GET
+      - httpApi:
+          path: /market/popular
+          method: GET
 
   WarmDefaultQuotes:
     handler: lambdas/warmDefaultQuotes.handler
@@ -89,6 +92,14 @@ functions:
     timeout: 15
     events:
       - schedule: rate(5 minutes)
+
+  RefreshPopularTickers:
+    handler: lambdas/refreshPopularTickers.handler
+    name: ${self:provider.stage}-${self:service}-refresh-popular-tickers
+    memorySize: 256
+    timeout: 15
+    events:
+      - schedule: rate(1 day)
 
   RefreshTickers:
     handler: lambdas/refreshTickers.handler

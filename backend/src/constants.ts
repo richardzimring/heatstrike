@@ -31,11 +31,18 @@ export const PROCESSING_LOCK_TTL_MS = 90 * 1000; // 90 seconds lock for in-fligh
 export const MAX_EXPIRATIONS = 20;
 export const TRADIER_CONCURRENCY = 5;
 
-// Home Page Default Tickers (pre-warmed by scheduled Lambda)
-export const DEFAULT_HOME_TICKERS = [
-  'SPY', 'QQQ', 'IWM', 'DIA',
+// Home Page Tickers
+export const INDEX_TICKERS = ['SPY', 'QQQ', 'IWM', 'DIA'];
+export const POPULAR_TICKERS_FALLBACK = [
   'AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'META', 'GOOG', 'AMD',
 ];
+export const POPULAR_TICKERS_COUNT = 8;
+export const POPULAR_TICKERS_S3_KEY = 'popular.json';
+
+// Crypto tickers that collide with real stocks but refer to crypto on Reddit
+export const CRYPTO_TICKER_EXCLUSIONS = new Set([
+  'BTC', 'ETH', 'SOL', 'XRP', 'ADA', 'DOT', 'DOGE', 'AVAX', 'LINK', 'MATIC',
+]);
 
 // Feedback Configuration
 export const FEEDBACK_RECIPIENT = getEnvironmentVariable('BUG_REPORT_EMAIL');

@@ -549,6 +549,12 @@
         "items": {
           "$ref": "#/components/schemas/QuoteSummary"
         }
+      },
+      "PopularTickersResponse": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
       }
     },
     "parameters": {}
@@ -725,6 +731,27 @@
                   "required": [
                     "error"
                   ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market/popular": {
+      "get": {
+        "tags": [
+          "Market"
+        ],
+        "summary": "Get popular tickers",
+        "description": "Returns popular tickers ranked by Reddit mention activity (YoloStocks WSB data). Refreshed daily.",
+        "responses": {
+          "200": {
+            "description": "Array of popular ticker symbols",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PopularTickersResponse"
                 }
               }
             }

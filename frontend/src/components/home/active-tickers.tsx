@@ -18,17 +18,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { TickerLogo } from '@/components/ticker-logo';
 import type { QuoteSummary } from '@/lib/api/generated';
 
-const POPULAR_TICKERS = [
-  'AAPL',
-  'TSLA',
-  'NVDA',
-  'AMZN',
-  'MSFT',
-  'META',
-  'GOOG',
-  'AMD',
-] as const;
-
 function formatVolume(vol: number): string {
   if (vol >= 1_000_000) return `${(vol / 1_000_000).toFixed(1)}M`;
   if (vol >= 1_000) return `${(vol / 1_000).toFixed(1)}K`;
@@ -47,6 +36,7 @@ function formatEarningsDate(dateStr: string | null): string {
 }
 
 interface ActiveTickersProps {
+  tickers: string[];
   quotesMap: Map<string, QuoteSummary>;
   isLoading: boolean;
 }
@@ -150,14 +140,16 @@ function TickerRow({
   );
 }
 
-export function ActiveTickers({ quotesMap, isLoading }: ActiveTickersProps) {
-  const showDayRange = POPULAR_TICKERS.some((t) => {
+export function ActiveTickers({
+  tickers,
+  quotesMap,
+  isLoading,
+}: ActiveTickersProps) {
+  const showDayRange = tickers.some((t) => {
     const q = quotesMap.get(t);
     return q?.high !== null && q?.low !== null;
   });
-  const showEarnings = POPULAR_TICKERS.some(
-    (t) => quotesMap.get(t)?.earnings_date,
-  );
+  const showEarnings = tickers.some((t) => quotesMap.get(t)?.earnings_date);
 
   return (
     <Card>
@@ -181,16 +173,31 @@ export function ActiveTickers({ quotesMap, isLoading }: ActiveTickersProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {POPULAR_TICKERS.map((ticker) => (
-              <TickerRow
-                key={ticker}
-                ticker={ticker}
-                quote={quotesMap.get(ticker)}
-                isLoading={isLoading}
-                showDayRange={showDayRange}
-                showEarnings={showEarnings}
-              />
-            ))}
+            {tickers.length === 0
+              ? Array.from({ length: 8 }, (_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="size-6 rounded-md" />
+                        <Skeleton className="h-4 w-12" />
+                      </div>
+                    </TableCell>
+                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-10" /></TableCell>
+                  </TableRow>
+                ))
+              : tickers.map((ticker) => (
+                  <TickerRow
+                    key={ticker}
+                    ticker={ticker}
+                    quote={quotesMap.get(ticker)}
+                    isLoading={isLoading}
+                    showDayRange={showDayRange}
+                    showEarnings={showEarnings}
+                  />
+                ))}
           </TableBody>
         </Table>
       </CardContent>

@@ -5,21 +5,9 @@ import { ActiveTickers } from '@/components/home/active-tickers';
 import { WatchlistCards } from '@/components/home/watchlist-cards';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useWatchlist } from '@/hooks/use-watchlist';
+import { usePopularTickers } from '@/hooks/use-popular-tickers';
 
-const DEFAULT_TICKERS = [
-  'SPY',
-  'QQQ',
-  'IWM',
-  'DIA',
-  'AAPL',
-  'TSLA',
-  'NVDA',
-  'AMZN',
-  'MSFT',
-  'META',
-  'GOOG',
-  'AMD',
-] as const;
+const INDEX_TICKERS = ['SPY', 'QQQ', 'IWM', 'DIA'];
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -27,23 +15,33 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   const { tickers: watchlistItems } = useWatchlist();
+  const { data: popularData } = usePopularTickers();
+
+  const popularTickers = useMemo(
+    () => popularData?.tickers ?? [],
+    [popularData],
+  );
+
+  const allHomeTickers = useMemo(
+    () => [...new Set([...INDEX_TICKERS, ...popularTickers])],
+    [popularTickers],
+  );
 
   const watchlistOnlyTickers = useMemo(() => {
-    const defaults = new Set<string>(DEFAULT_TICKERS);
-    return watchlistItems.map((w) => w.t).filter((t) => !defaults.has(t));
-  }, [watchlistItems]);
+    const homeSet = new Set(allHomeTickers);
+    return watchlistItems.map((w) => w.t).filter((t) => !homeSet.has(t));
+  }, [watchlistItems, allHomeTickers]);
 
-  const { quotesMap: defaultQuotesMap, isLoading: defaultsLoading } = useQuotes(
-    [...DEFAULT_TICKERS],
-  );
+  const { quotesMap: homeQuotesMap, isLoading: homeLoading } =
+    useQuotes(allHomeTickers);
   const { quotesMap: watchlistQuotesMap, isLoading: watchlistLoading } =
     useQuotes(watchlistOnlyTickers);
 
   const watchlistMergedMap = useMemo(() => {
-    const merged = new Map(defaultQuotesMap);
+    const merged = new Map(homeQuotesMap);
     for (const [k, v] of watchlistQuotesMap) merged.set(k, v);
     return merged;
-  }, [defaultQuotesMap, watchlistQuotesMap]);
+  }, [homeQuotesMap, watchlistQuotesMap]);
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
@@ -56,11 +54,15 @@ function HomePage() {
         </p>
       </div>
 
-      <MarketCards quotesMap={defaultQuotesMap} isLoading={defaultsLoading} />
-      <ActiveTickers quotesMap={defaultQuotesMap} isLoading={defaultsLoading} />
+      <MarketCards quotesMap={homeQuotesMap} isLoading={homeLoading} />
+      <ActiveTickers
+        tickers={popularTickers}
+        quotesMap={homeQuotesMap}
+        isLoading={homeLoading}
+      />
       <WatchlistCards
         quotesMap={watchlistMergedMap}
-        isLoading={watchlistLoading || defaultsLoading}
+        isLoading={watchlistLoading || homeLoading}
       />
     </div>
   );

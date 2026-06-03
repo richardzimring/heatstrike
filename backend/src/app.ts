@@ -7,6 +7,7 @@ import {
   feedbackRouter,
   tickersRouter,
   marketRouter,
+  popularRouter,
 } from './routes/index';
 
 export const app = new OpenAPIHono();
@@ -19,6 +20,7 @@ app.route('/', optionsRouter);
 app.route('/', feedbackRouter);
 app.route('/', tickersRouter);
 app.route('/', marketRouter);
+app.route('/', popularRouter);
 
 app.notFound((c) => {
   return c.json({ error: 'Not Found' }, 404);
