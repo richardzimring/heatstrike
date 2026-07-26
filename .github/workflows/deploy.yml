@@ -5,6 +5,12 @@ on:
     branches: [main]
     paths:
       - "frontend/**"
+      # The typed client is generated from this spec during the build, so a
+      # backend-only change to it still has to redeploy the site — otherwise
+      # the shipped client drifts until the next frontend commit.
+      - "backend/openapi.json"
+      # Build inputs live here too (VITE_API_URL, node version).
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
 permissions:
