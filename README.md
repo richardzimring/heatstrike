@@ -2,7 +2,7 @@
 
 An interactive stock options heatmap. Visualize volume, open interest, price, spread, and greeks for any ticker.
 
-**Live site**: [https://richardzimring.github.io/heatstrike](https://richardzimring.github.io/heatstrike)
+**Live site**: [https://heatstrike.rzimring.com](https://heatstrike.rzimring.com)
 
 <img width="1512" height="827" alt="Screenshot 2026-04-01 at 11 38 13 PM" src="https://github.com/user-attachments/assets/e1f3dd40-1301-47d8-8132-b89ea6567a68" />
 
