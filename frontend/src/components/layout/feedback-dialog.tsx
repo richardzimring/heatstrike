@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, CheckCircle2 } from 'lucide-react';
+import { Bug, CheckCircle2, Lightbulb, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,6 +12,10 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from '@/components/ui/toggle-group';
 import { postFeedback } from '@/lib/api/generated';
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
@@ -108,32 +112,33 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
           <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-2">
               <Label>Type</Label>
-              <div className="flex rounded-md border border-input bg-muted p-1">
-                <button
-                  type="button"
-                  onClick={() => setFeedbackType('bug')}
-                  className={`flex-1 rounded px-3 py-1.5 text-sm font-medium transition-colors ${
-                    feedbackType === 'bug'
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                  disabled={status === 'submitting'}
+              <ToggleGroup
+                type="single"
+                variant="outline"
+                size="lg"
+                spacing={2}
+                value={feedbackType}
+                onValueChange={(v) => {
+                  if (v) setFeedbackType(v as FeedbackType);
+                }}
+                disabled={status === 'submitting'}
+                className="w-full"
+              >
+                <ToggleGroupItem
+                  value="bug"
+                  className="flex-1 gap-1.5 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
                 >
-                  Bug Report
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFeedbackType('feature_request')}
-                  className={`flex-1 rounded px-3 py-1.5 text-sm font-medium transition-colors ${
-                    feedbackType === 'feature_request'
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                  disabled={status === 'submitting'}
+                  <Bug />
+                  Bug
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="feature_request"
+                  className="flex-1 gap-1.5 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
                 >
-                  Feature Request
-                </button>
-              </div>
+                  <Lightbulb />
+                  Feature
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             <div className="grid gap-2">
