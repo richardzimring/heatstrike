@@ -16,7 +16,7 @@ function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TooltipProvider>
-          <SidebarProvider>
+          <SidebarProvider open={false} onOpenChange={() => {}}>
             <AppSidebar />
             <SidebarInset>
               <SiteHeader />

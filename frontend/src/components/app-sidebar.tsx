@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import {
-  LayoutDashboard,
-  Grid3X3,
-  Star,
-  X,
-  Github,
-  MessageSquarePlus,
-} from 'lucide-react';
+import { LayoutDashboard, Grid3X3, Github, MessageSquarePlus } from 'lucide-react';
 import { FeedbackDialog } from '@/components/layout/feedback-dialog';
 import {
   Sidebar,
@@ -15,34 +8,37 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
-import { useWatchlist } from '@/hooks/use-watchlist';
-import { useRecentTickers } from '@/hooks/useRecentTickers';
+import { useRecentTickers } from '@/hooks/use-recent-tickers';
 
 export function AppSidebar() {
   const navigate = useNavigate();
   const params = useParams({ strict: false }) as { ticker?: string };
-  const { tickers: watchlist, removeTicker } = useWatchlist();
   const { recents } = useRecentTickers();
+  const { isMobile, setOpenMobile } = useSidebar();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const currentTicker = params.ticker?.toUpperCase();
   const lastTicker = recents[0]?.t ?? 'AAPL';
 
+  const go = (action: () => void) => {
+    action();
+    if (isMobile) setOpenMobile(false);
+  };
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-3 rounded-[calc(var(--radius-sm)+2px)] p-2">
+        <div className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
           <button
             type="button"
-            onClick={() => navigate({ to: '/' })}
+            onClick={() => go(() => navigate({ to: '/' }))}
             className="inline-flex size-8 items-center justify-center rounded-md hover:bg-accent cursor-pointer"
             aria-label="Go to home"
           >
@@ -52,7 +48,7 @@ export function AppSidebar() {
               className="size-6 shrink-0"
             />
           </button>
-          <span className="font-semibold text-lg group-data-[collapsible=icon]:hidden">
+          <span className="font-semibold text-lg tracking-tight group-data-[collapsible=icon]:hidden">
             Heatstrike
           </span>
         </div>
@@ -60,13 +56,12 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={!currentTicker}
-                  onClick={() => navigate({ to: '/' })}
+                  onClick={() => go(() => navigate({ to: '/' }))}
                   tooltip="Home"
                 >
                   <LayoutDashboard />
@@ -77,11 +72,13 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   isActive={!!currentTicker}
                   onClick={() =>
-                    navigate({
-                      to: '/$ticker',
-                      params: { ticker: currentTicker ?? lastTicker },
-                      search: { direction: 'calls', metric: 'volume' },
-                    })
+                    go(() =>
+                      navigate({
+                        to: '/$ticker',
+                        params: { ticker: currentTicker ?? lastTicker },
+                        search: { direction: 'calls', metric: 'volume' },
+                      }),
+                    )
                   }
                   tooltip="Options Explorer"
                 >
@@ -89,54 +86,6 @@ export function AppSidebar() {
                   <span>Options Explorer</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="gap-2">
-            <Star className="size-3" />
-            <span>Watchlist</span>
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {watchlist.length === 0 ? (
-                <SidebarMenuItem>
-                  <span className="px-2 text-xs text-muted-foreground">
-                    No tickers saved
-                  </span>
-                </SidebarMenuItem>
-              ) : (
-                watchlist.map((item) => (
-                  <SidebarMenuItem key={item.t}>
-                    <SidebarMenuButton
-                      isActive={currentTicker === item.t}
-                      onClick={() =>
-                        navigate({
-                          to: '/$ticker',
-                          params: { ticker: item.t },
-                          search: { direction: 'calls', metric: 'volume' },
-                        })
-                      }
-                      tooltip={item.n}
-                      className="group-data-[collapsible=icon]:!size-auto group-data-[collapsible=icon]:!px-1.5 group-data-[collapsible=icon]:!py-1"
-                    >
-                      <span className="font-mono text-xs">{item.t}</span>
-                      <span className="truncate text-muted-foreground group-data-[collapsible=icon]:hidden">
-                        {item.n}
-                      </span>
-                    </SidebarMenuButton>
-                    <SidebarMenuAction
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeTicker(item.t);
-                      }}
-                    >
-                      <X />
-                    </SidebarMenuAction>
-                  </SidebarMenuItem>
-                ))
-              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
