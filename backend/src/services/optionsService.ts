@@ -21,8 +21,8 @@ import {
   fetchExpirationDates,
   fetchQuote,
   fetchOptionData,
+  fetchEarnings,
 } from '../requests/index';
-import { fetchEarnings } from '../requests/getEarnings';
 import { stringifyDates, getOptionsCacheTtlMs } from '../utils/index';
 import type {
   OptionsDataResponse,

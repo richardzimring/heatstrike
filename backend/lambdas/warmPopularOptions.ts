@@ -15,7 +15,7 @@ export const handler = async (): Promise<void> => {
   const popularTickers = await readPopularSymbolsFromS3();
   const tickers = [...new Set([...INDEX_TICKERS, ...popularTickers])];
   console.log(
-    `Warming options chains for ${tickers.length} tickers (${INDEX_TICKERS.length} index + ${popularTickers.length} popular)...`,
+    `Warming explorer options chains for ${tickers.length} tickers (${INDEX_TICKERS.length} index + ${popularTickers.length} popular)...`,
   );
 
   let ready = 0;

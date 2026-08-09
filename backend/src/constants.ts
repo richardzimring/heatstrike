@@ -30,10 +30,12 @@ export const PROCESSING_LOCK_TTL_MS = 90 * 1000; // 90 seconds lock for in-fligh
 export const MAX_EXPIRATIONS = 20;
 export const TRADIER_CONCURRENCY = 5;
 
-// Index ETFs shown on home (quote summaries)
+// Index ETFs shown on the home page. Also warmed as options chains (with
+// popular tickers) so explorer opens stay snappy for common index symbols.
 export const INDEX_TICKERS = ['SPY', 'QQQ', 'IWM', 'DIA'] as const;
 
-// Popular tickers (YoloStocks / home launcher)
+// Popular tickers (YoloStocks / home launcher). Keep in sync with the
+// frontend fallback list in use-popular-tickers.ts.
 export const POPULAR_TICKERS_FALLBACK = [
   'AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'META', 'GOOG', 'AMD',
 ];

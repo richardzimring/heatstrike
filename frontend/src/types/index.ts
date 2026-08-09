@@ -28,11 +28,6 @@ export interface MetricOption {
   selectedLabel?: string;
 }
 
-export interface DirectionOption {
-  value: Direction;
-  label: string;
-}
-
 export const METRIC_OPTIONS: MetricOption[] = [
   { value: 'volume', label: 'Volume' },
   { value: 'open_interest', label: 'Open Interest', selectedLabel: 'OI' },
@@ -46,9 +41,4 @@ export const METRIC_OPTIONS: MetricOption[] = [
   { value: 'vega', label: 'Vega' },
   { value: 'rho', label: 'Rho' },
   { value: 'phi', label: 'Phi' },
-];
-
-export const DIRECTION_OPTIONS: DirectionOption[] = [
-  { value: 'calls', label: 'Calls' },
-  { value: 'puts', label: 'Puts' },
 ];

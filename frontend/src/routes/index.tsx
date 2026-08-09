@@ -1,17 +1,19 @@
 import { useMemo } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { OptionsPulse } from '@/components/home/options-pulse';
+import { TickerPulse } from '@/components/home/ticker-pulse';
 import {
+  emptyPulseRow,
   isSummaryReady,
   summaryToPulseRow,
-  type OptionsPulseRow,
-} from '@/lib/options-pulse';
+  type TickerPulseRow,
+} from '@/lib/ticker-pulse';
 import { useWatchlist } from '@/hooks/use-watchlist';
 import { useRecentTickers } from '@/hooks/use-recent-tickers';
 import { usePopularTickers } from '@/hooks/use-popular-tickers';
-import { useOptionsSummaries } from '@/hooks/use-options-summaries';
-import type { OptionsTickerSummary } from '@/lib/api/generated';
+import { useQuoteSummaries } from '@/hooks/use-quote-summaries';
+import type { QuoteTickerSummary } from '@/lib/api/generated';
 
+/** Keep symbols in sync with backend INDEX_TICKERS. */
 const INDEX_TICKERS = [
   { t: 'SPY', n: 'S&P 500' },
   { t: 'QQQ', n: 'Nasdaq 100' },
@@ -19,24 +21,14 @@ const INDEX_TICKERS = [
   { t: 'DIA', n: 'Dow Jones' },
 ] as const;
 
-function emptyRow(ticker: string, name: string): OptionsPulseRow {
-  return {
-    ticker,
-    name,
-    price: '',
-    change_percentage: '',
-  };
-}
-
 function rowFromSummary(
-  summary: OptionsTickerSummary | undefined,
+  summary: QuoteTickerSummary | undefined,
   ticker: string,
-  name: string,
-): OptionsPulseRow {
+): TickerPulseRow {
   if (!summary || !isSummaryReady(summary)) {
-    return emptyRow(ticker, name);
+    return emptyPulseRow(ticker);
   }
-  return summaryToPulseRow(summary, name);
+  return summaryToPulseRow(summary);
 }
 
 export const Route = createFileRoute('/')({
@@ -68,7 +60,7 @@ function HomePage() {
       (popularData?.tickers ?? [])
         .filter((s) => !indexSet.has(s.ticker))
         .map((s) =>
-          isSummaryReady(s) ? summaryToPulseRow(s) : emptyRow(s.ticker, s.description || s.ticker),
+          isSummaryReady(s) ? summaryToPulseRow(s) : emptyPulseRow(s.ticker),
         ),
     [popularData, indexSet],
   );
@@ -83,14 +75,13 @@ function HomePage() {
   }, [watchlistItems, recentItems]);
 
   const { summariesMap, isLoading: summariesLoading } =
-    useOptionsSummaries(summaryTickers);
+    useQuoteSummaries(summaryTickers);
 
   const favoriteRows = useMemo(() => {
     return watchlistItems.map((item) =>
       rowFromSummary(
         summariesMap.get(item.t.toUpperCase()),
         item.t.toUpperCase(),
-        item.n,
       ),
     );
   }, [watchlistItems, summariesMap]);
@@ -100,20 +91,19 @@ function HomePage() {
       rowFromSummary(
         summariesMap.get(item.t.toUpperCase()),
         item.t.toUpperCase(),
-        item.n,
       ),
     );
   }, [recentItems, summariesMap]);
 
   const indexRows = useMemo(() => {
     return INDEX_TICKERS.map((item) =>
-      rowFromSummary(summariesMap.get(item.t), item.t, item.n),
+      rowFromSummary(summariesMap.get(item.t), item.t),
     );
   }, [summariesMap]);
 
   return (
     <div className="p-4 md:p-6">
-      <OptionsPulse
+      <TickerPulse
         favorites={favoriteRows}
         recent={recentRows}
         indexes={indexRows}

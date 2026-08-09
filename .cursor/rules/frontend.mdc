@@ -24,18 +24,18 @@ frontend/src/
   main.tsx             # Entry point, router setup
   routeTree.gen.ts     # Auto-generated route tree — do not edit
   routes/
-    __root.tsx         # Root layout with providers
-    index.tsx          # Redirects / to default ticker
-    $ticker.tsx        # Main dashboard route with search params
+    __root.tsx         # Root layout with providers + app shell
+    index.tsx          # Home launcher (watchlist / recent / popular / indexes)
+    $ticker.tsx        # Options explorer route with search params
   components/
-    Dashboard.tsx      # Main dashboard component
-    controls/          # User input components (ticker, metric, direction selects)
-    heatmap/           # Visualization components (visx-based heatmap)
-    layout/            # App shell (Header, ThemeProvider, ThemeToggle)
+    home/              # Home ticker tiles (TickerPulse)
+    explorer/          # Options explorer (dashboard, heatmap, controls)
+    layout/            # Shell helpers (search, feedback, theme)
     ui/                # shadcn/ui primitives — do not edit by hand
-  hooks/               # Custom React Query hooks (useOptionsData, useTickers)
+  hooks/               # Custom React Query hooks
   lib/
     api/generated/     # Auto-generated API client — do not edit
+    ticker-pulse.ts    # Home tile row helpers
     queryClient.ts     # Singleton QueryClient config
     utils.ts           # Shared utilities (cn, formatRelativeTime)
   types/index.ts       # App-wide types derived from API types
@@ -47,7 +47,7 @@ frontend/src/
 
 The API client is auto-generated from the backend OpenAPI spec. Never edit files in `lib/api/generated/`.
 
-Data fetching hooks follow this pattern (see `hooks/useOptionsData.ts`):
+Data fetching hooks follow this pattern (see `hooks/useOptionsData.ts`, `hooks/use-quote-summaries.ts`):
 
 1. Import the generated SDK function and configure the client
 2. Write a thin async wrapper that calls the SDK and throws on error
@@ -59,9 +59,9 @@ App types are derived from the generated API types — see `types/index.ts`. Use
 
 ### Components
 
-- Feature folders under `components/` (controls, heatmap, layout)
+- Feature folders under `components/` (`home`, `explorer`, `layout`)
 - shadcn/ui components in `components/ui/` — add new ones via the shadcn CLI, don't write by hand
-  - Always prefer installing/importing chadcn/ui components over creating custom implementations
+  - Always prefer installing/importing shadcn/ui components over creating custom implementations
 - Use `cn()` from `lib/utils` for conditional Tailwind classes
 - Props interfaces defined inline above the component
 
@@ -76,7 +76,7 @@ App types are derived from the generated API types — see `types/index.ts`. Use
 
 TanStack Router provides file-based routing with deep linking support. Uses hash-based routing for GitHub Pages compatibility (no server-side rewrites needed):
 
-- **URL structure**: `/heatstrike/#/AAPL?direction=calls&metric=volume`
+- **URL structure**: `/#/` for home, `/#/AAPL?direction=calls&metric=volume` for explorer
 - **Path params**: ticker (e.g., `AAPL`)
 - **Search params**: `direction` (calls/puts), `metric` (volume, open_interest, etc.)
 - Routes are defined in `src/routes/` — the Vite plugin auto-generates `routeTree.gen.ts`

@@ -463,7 +463,7 @@
           "$ref": "#/components/schemas/TickerEntry"
         }
       },
-      "OptionsTickerSummary": {
+      "QuoteTickerSummary": {
         "type": "object",
         "properties": {
           "ticker": {
@@ -490,10 +490,10 @@
           "change_percentage"
         ]
       },
-      "OptionsSummariesResponse": {
+      "QuoteSummariesResponse": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/OptionsTickerSummary"
+          "$ref": "#/components/schemas/QuoteTickerSummary"
         }
       }
     },
@@ -652,7 +652,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OptionsSummariesResponse"
+                  "$ref": "#/components/schemas/QuoteSummariesResponse"
                 }
               }
             }
@@ -691,7 +691,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OptionsSummariesResponse"
+                  "$ref": "#/components/schemas/QuoteSummariesResponse"
                 }
               }
             }

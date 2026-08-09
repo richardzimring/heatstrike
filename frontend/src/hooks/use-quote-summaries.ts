@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { getMarketSummaries } from '@/lib/api/generated';
-import type { OptionsTickerSummary } from '@/lib/api/generated';
-import { normalizeSummaries } from '@/lib/options-pulse';
+import type { QuoteTickerSummary } from '@/lib/api/generated';
+import { normalizeSummaries } from '@/lib/ticker-pulse';
 import { parseCacheControlMaxAgeMs } from '@/lib/utils';
 
 const DEFAULT_STALE_TIME_MS = 60 * 1000;
 
-export function useOptionsSummaries(tickers: string[]) {
+export function useQuoteSummaries(tickers: string[]) {
   const sorted = useMemo(
     () => [...new Set(tickers.map((t) => t.toUpperCase()))].sort(),
     [tickers],
@@ -15,14 +15,14 @@ export function useOptionsSummaries(tickers: string[]) {
   const key = sorted.join(',');
 
   const query = useQuery({
-    queryKey: ['options-summaries', key],
+    queryKey: ['quote-summaries', key],
     queryFn: async () => {
       const { data, error, response } = await getMarketSummaries({
         query: { tickers: key },
       });
 
       if (error) {
-        throw new Error('Failed to fetch options summaries');
+        throw new Error('Failed to fetch quote summaries');
       }
 
       const staleTimeMs =
@@ -42,7 +42,7 @@ export function useOptionsSummaries(tickers: string[]) {
   });
 
   const summariesMap = useMemo(() => {
-    const map = new Map<string, OptionsTickerSummary>();
+    const map = new Map<string, QuoteTickerSummary>();
     for (const summary of query.data?.summaries ?? []) {
       map.set(summary.ticker.toUpperCase(), summary);
     }

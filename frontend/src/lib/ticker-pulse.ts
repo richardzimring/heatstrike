@@ -1,13 +1,12 @@
-import type { OptionsTickerSummary } from '@/lib/api/generated';
+import type { QuoteTickerSummary } from '@/lib/api/generated';
 
-export interface OptionsPulseRow {
+export interface TickerPulseRow {
   ticker: string;
-  name: string;
   price: string;
   change_percentage: string;
 }
 
-export function emptySummary(ticker: string): OptionsTickerSummary {
+export function emptySummary(ticker: string): QuoteTickerSummary {
   return {
     ticker,
     description: ticker,
@@ -16,12 +15,24 @@ export function emptySummary(ticker: string): OptionsTickerSummary {
   };
 }
 
+export function emptyPulseRow(ticker: string): TickerPulseRow {
+  return {
+    ticker,
+    price: '',
+    change_percentage: '',
+  };
+}
+
 /** Placeholders omit price; real summaries always include a quote price. */
-export function isSummaryReady(summary: OptionsTickerSummary): boolean {
+export function isSummaryReady(summary: QuoteTickerSummary): boolean {
   return Boolean(summary.price);
 }
 
-function asTickerSummary(value: unknown): OptionsTickerSummary | null {
+export function isPulseRowReady(row: TickerPulseRow): boolean {
+  return Boolean(row.price);
+}
+
+function asTickerSummary(value: unknown): QuoteTickerSummary | null {
   if (!value || typeof value !== 'object') return null;
 
   const record = value as Record<string, unknown>;
@@ -43,20 +54,18 @@ function asTickerSummary(value: unknown): OptionsTickerSummary | null {
   };
 }
 
-export function normalizeSummaries(data: unknown): OptionsTickerSummary[] {
+export function normalizeSummaries(data: unknown): QuoteTickerSummary[] {
   if (!Array.isArray(data)) return [];
   return data
     .map((item) => asTickerSummary(item))
-    .filter((item): item is OptionsTickerSummary => item !== null);
+    .filter((item): item is QuoteTickerSummary => item !== null);
 }
 
 export function summaryToPulseRow(
-  summary: OptionsTickerSummary,
-  nameOverride?: string,
-): OptionsPulseRow {
+  summary: QuoteTickerSummary,
+): TickerPulseRow {
   return {
     ticker: summary.ticker,
-    name: nameOverride || summary.description || summary.ticker,
     price: summary.price ?? '',
     change_percentage: summary.change_percentage ?? '',
   };

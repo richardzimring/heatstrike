@@ -6,18 +6,18 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { OPTIONS_TABLE_NAME } from '../constants';
 import { fetchQuotes, type QuoteSummary } from '../requests/getQuote';
-import type { OptionsTickerSummary } from '../schemas/popular';
+import type { QuoteTickerSummary } from '../schemas/popular';
 
 const ddbDocClient = DynamoDBDocumentClient.from(new DynamoDBClient());
 
 /** Home quote cache TTL — short so prices stay reasonably fresh. */
-export const QUOTE_SUMMARY_TTL_SECONDS = 60;
+const QUOTE_SUMMARY_TTL_SECONDS = 60;
 
-export function summaryKey(ticker: string): string {
+function summaryKey(ticker: string): string {
   return `quote-summary:${ticker}`;
 }
 
-export function summaryFromQuote(quote: QuoteSummary): OptionsTickerSummary {
+function summaryFromQuote(quote: QuoteSummary): QuoteTickerSummary {
   return {
     ticker: quote.ticker.toUpperCase(),
     description: quote.description || quote.ticker,
@@ -26,8 +26,8 @@ export function summaryFromQuote(quote: QuoteSummary): OptionsTickerSummary {
   };
 }
 
-export async function saveOptionsSummary(
-  summary: OptionsTickerSummary,
+async function saveQuoteSummary(
+  summary: QuoteTickerSummary,
   ttlSeconds: number,
 ): Promise<void> {
   await ddbDocClient.send(
@@ -42,10 +42,10 @@ export async function saveOptionsSummary(
   );
 }
 
-export async function getOptionsSummaries(
+async function getQuoteSummaries(
   tickers: string[],
-): Promise<Map<string, OptionsTickerSummary>> {
-  const result = new Map<string, OptionsTickerSummary>();
+): Promise<Map<string, QuoteTickerSummary>> {
+  const result = new Map<string, QuoteTickerSummary>();
   if (tickers.length === 0) return result;
 
   const nowSeconds = Math.floor(Date.now() / 1000);
@@ -91,10 +91,10 @@ export async function getOptionsSummaries(
 }
 
 /** Prefer Dynamo quote cache; hydrate misses with a single Tradier quotes batch. */
-export async function resolveOptionsSummaries(
+export async function resolveQuoteSummaries(
   tickers: string[],
-): Promise<Map<string, OptionsTickerSummary>> {
-  const summaries = await getOptionsSummaries(tickers);
+): Promise<Map<string, QuoteTickerSummary>> {
+  const summaries = await getQuoteSummaries(tickers);
   const missing = tickers
     .map((t) => t.toUpperCase())
     .filter((t) => !summaries.has(t));
@@ -109,7 +109,7 @@ export async function resolveOptionsSummaries(
       quotes.map(async (quote) => {
         const summary = summaryFromQuote(quote);
         summaries.set(summary.ticker, summary);
-        await saveOptionsSummary(summary, ttl).catch(() => undefined);
+        await saveQuoteSummary(summary, ttl).catch(() => undefined);
       }),
     );
   } catch (err) {
@@ -119,7 +119,7 @@ export async function resolveOptionsSummaries(
   return summaries;
 }
 
-export function placeholderSummary(ticker: string): OptionsTickerSummary {
+export function placeholderQuoteSummary(ticker: string): QuoteTickerSummary {
   return {
     ticker,
     description: ticker,

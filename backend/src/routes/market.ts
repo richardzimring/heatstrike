@@ -1,9 +1,9 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
-import { OptionsSummariesResponseSchema } from '../schemas/popular';
+import { QuoteSummariesResponseSchema } from '../schemas/popular';
 import {
-  resolveOptionsSummaries,
-  placeholderSummary,
-} from '../services/optionsSummary';
+  resolveQuoteSummaries,
+  placeholderQuoteSummary,
+} from '../services/quoteSummary';
 
 const MAX_TICKERS = 30;
 
@@ -28,7 +28,7 @@ const getMarketSummariesRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: OptionsSummariesResponseSchema,
+          schema: QuoteSummariesResponseSchema,
         },
       },
       description: 'Quote summaries in request order',
@@ -64,9 +64,9 @@ marketRouter.openapi(getMarketSummariesRoute, async (c) => {
     return c.json({ error: `Maximum ${MAX_TICKERS} tickers allowed` }, 400);
   }
 
-  const summaries = await resolveOptionsSummaries(tickers);
+  const summaries = await resolveQuoteSummaries(tickers);
   const payload = tickers.map(
-    (ticker) => summaries.get(ticker) ?? placeholderSummary(ticker),
+    (ticker) => summaries.get(ticker) ?? placeholderQuoteSummary(ticker),
   );
 
   c.header('Cache-Control', 'public, max-age=60');

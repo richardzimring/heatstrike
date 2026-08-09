@@ -4,7 +4,7 @@ import { TickerLogo } from '@/components/ticker-logo';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import type { OptionsPulseRow } from '@/lib/options-pulse';
+import { isPulseRowReady, type TickerPulseRow } from '@/lib/ticker-pulse';
 
 function isPositiveChange(change: string): boolean {
   return change.startsWith('+') || (!change.startsWith('-') && change !== '');
@@ -37,10 +37,6 @@ function formatPrice(price: string): string | null {
   })}`;
 }
 
-function isRowReady(row: OptionsPulseRow): boolean {
-  return Boolean(row.price || row.change_percentage);
-}
-
 const tileGridClass =
   'grid grid-cols-[repeat(auto-fill,minmax(9.25rem,1fr))] gap-2';
 
@@ -64,12 +60,12 @@ function TickerTile({
   onRemove,
   removeLabel,
 }: {
-  row: OptionsPulseRow;
+  row: TickerPulseRow;
   onRemove?: (ticker: string) => void;
   removeLabel: string;
 }) {
   const navigate = useNavigate();
-  const ready = isRowReady(row);
+  const ready = isPulseRowReady(row);
   const price = formatPrice(row.price);
   const change = formatChange(row.change_percentage);
   const positive = isPositiveChange(row.change_percentage);
@@ -144,7 +140,7 @@ function TickerTiles({
   onRemove,
   removeLabel = 'list',
 }: {
-  rows: OptionsPulseRow[];
+  rows: TickerPulseRow[];
   isLoading?: boolean;
   onRemove?: (ticker: string) => void;
   removeLabel?: string;
@@ -190,11 +186,11 @@ function Section({
   );
 }
 
-interface OptionsPulseProps {
-  favorites: OptionsPulseRow[];
-  recent: OptionsPulseRow[];
-  indexes: OptionsPulseRow[];
-  popular: OptionsPulseRow[];
+interface TickerPulseProps {
+  favorites: TickerPulseRow[];
+  recent: TickerPulseRow[];
+  indexes: TickerPulseRow[];
+  popular: TickerPulseRow[];
   favoritesLoading?: boolean;
   recentLoading?: boolean;
   indexesLoading?: boolean;
@@ -203,7 +199,7 @@ interface OptionsPulseProps {
   onRemoveFavorite?: (ticker: string) => void;
 }
 
-export function OptionsPulse({
+export function TickerPulse({
   favorites,
   recent,
   indexes,
@@ -214,7 +210,7 @@ export function OptionsPulse({
   popularLoading,
   onRemoveRecent,
   onRemoveFavorite,
-}: OptionsPulseProps) {
+}: TickerPulseProps) {
   return (
     <div className="flex flex-col gap-8">
       {favorites.length > 0 && (

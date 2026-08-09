@@ -1,23 +1,23 @@
 import { z } from '@hono/zod-openapi';
 
 /** Quote fields used by the home ticker launcher. */
-export const OptionsTickerSummarySchema = z
+export const QuoteTickerSummarySchema = z
   .object({
     ticker: z.string().openapi({ example: 'NVDA' }),
     description: z.string().openapi({ example: 'NVIDIA Corp' }),
     price: z.string().openapi({ example: '223.78' }),
     change_percentage: z.string().openapi({ example: '+2.27' }),
   })
-  .openapi('OptionsTickerSummary');
+  .openapi('QuoteTickerSummary');
 
-export type OptionsTickerSummary = z.infer<typeof OptionsTickerSummarySchema>;
+export type QuoteTickerSummary = z.infer<typeof QuoteTickerSummarySchema>;
 
-export const OptionsSummariesResponseSchema = z
-  .array(OptionsTickerSummarySchema)
-  .openapi('OptionsSummariesResponse');
+export const QuoteSummariesResponseSchema = z
+  .array(QuoteTickerSummarySchema)
+  .openapi('QuoteSummariesResponse');
 
-export type OptionsSummariesResponse = z.infer<
-  typeof OptionsSummariesResponseSchema
+export type QuoteSummariesResponse = z.infer<
+  typeof QuoteSummariesResponseSchema
 >;
 
 /** Symbol list stored in S3 popular.json (ranking only). */

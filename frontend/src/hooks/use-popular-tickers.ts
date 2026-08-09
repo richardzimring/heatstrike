@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMarketPopular } from '@/lib/api/generated';
-import { emptySummary, normalizeSummaries } from '@/lib/options-pulse';
+import { emptySummary, normalizeSummaries } from '@/lib/ticker-pulse';
 import { parseCacheControlMaxAgeMs } from '@/lib/utils';
 
 const DEFAULT_STALE_TIME_MS = 5 * 60 * 1000;
 
+// Keep in sync with backend POPULAR_TICKERS_FALLBACK.
 const FALLBACK = [
   'AAPL',
   'TSLA',

@@ -1,14 +1,12 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
-import {
-  OptionsSummariesResponseSchema,
-} from '../schemas/popular';
+import { QuoteSummariesResponseSchema } from '../schemas/popular';
 import type { PopularTickerList } from '../schemas/popular';
 import { CACHE_TTL_MS } from '../constants';
 import { readPopularSymbolsFromS3 } from '../services/popularTickers';
 import {
-  resolveOptionsSummaries,
-  placeholderSummary,
-} from '../services/optionsSummary';
+  resolveQuoteSummaries,
+  placeholderQuoteSummary,
+} from '../services/quoteSummary';
 
 const POPULAR_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
@@ -58,7 +56,7 @@ const getPopularRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: OptionsSummariesResponseSchema,
+          schema: QuoteSummariesResponseSchema,
         },
       },
       description: 'Ranked popular tickers with quote summaries',
@@ -68,10 +66,10 @@ const getPopularRoute = createRoute({
 
 popularRouter.openapi(getPopularRoute, async (c) => {
   const { symbols, maxAgeSeconds } = await loadPopularSymbols();
-  const summaries = await resolveOptionsSummaries(symbols);
+  const summaries = await resolveQuoteSummaries(symbols);
 
   const payload = symbols.map(
-    (ticker) => summaries.get(ticker) ?? placeholderSummary(ticker),
+    (ticker) => summaries.get(ticker) ?? placeholderQuoteSummary(ticker),
   );
 
   const summaryMaxAge = Math.min(maxAgeSeconds, 60);
