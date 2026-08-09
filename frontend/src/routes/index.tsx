@@ -1,68 +1,129 @@
 import { useMemo } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { MarketCards } from '@/components/home/market-cards';
-import { ActiveTickers } from '@/components/home/active-tickers';
-import { WatchlistCards } from '@/components/home/watchlist-cards';
-import { useQuotes } from '@/hooks/use-quotes';
+import { OptionsPulse } from '@/components/home/options-pulse';
+import {
+  isSummaryReady,
+  summaryToPulseRow,
+  type OptionsPulseRow,
+} from '@/lib/options-pulse';
 import { useWatchlist } from '@/hooks/use-watchlist';
+import { useRecentTickers } from '@/hooks/use-recent-tickers';
 import { usePopularTickers } from '@/hooks/use-popular-tickers';
+import { useOptionsSummaries } from '@/hooks/use-options-summaries';
+import type { OptionsTickerSummary } from '@/lib/api/generated';
 
-const INDEX_TICKERS = ['SPY', 'QQQ', 'IWM', 'DIA'];
+const INDEX_TICKERS = [
+  { t: 'SPY', n: 'S&P 500' },
+  { t: 'QQQ', n: 'Nasdaq 100' },
+  { t: 'IWM', n: 'Russell 2000' },
+  { t: 'DIA', n: 'Dow Jones' },
+] as const;
+
+function emptyRow(ticker: string, name: string): OptionsPulseRow {
+  return {
+    ticker,
+    name,
+    price: '',
+    change_percentage: '',
+  };
+}
+
+function rowFromSummary(
+  summary: OptionsTickerSummary | undefined,
+  ticker: string,
+  name: string,
+): OptionsPulseRow {
+  if (!summary || !isSummaryReady(summary)) {
+    return emptyRow(ticker, name);
+  }
+  return summaryToPulseRow(summary, name);
+}
 
 export const Route = createFileRoute('/')({
   component: HomePage,
 });
 
 function HomePage() {
-  const { tickers: watchlistItems } = useWatchlist();
-  const { data: popularData } = usePopularTickers();
+  const { tickers: watchlistItems, removeTicker } = useWatchlist();
+  const { recents, removeRecentTicker } = useRecentTickers(8);
+  const { data: popularData, isLoading: popularLoading } = usePopularTickers();
 
-  const popularTickers = useMemo(
-    () => popularData?.tickers ?? [],
-    [popularData],
+  const watchlistSet = useMemo(
+    () => new Set(watchlistItems.map((w) => w.t.toUpperCase())),
+    [watchlistItems],
   );
 
-  const allHomeTickers = useMemo(
-    () => [...new Set([...INDEX_TICKERS, ...popularTickers])],
-    [popularTickers],
+  const recentItems = useMemo(
+    () => recents.filter((r) => !watchlistSet.has(r.t.toUpperCase())),
+    [recents, watchlistSet],
   );
 
-  const watchlistOnlyTickers = useMemo(() => {
-    const homeSet = new Set(allHomeTickers);
-    return watchlistItems.map((w) => w.t).filter((t) => !homeSet.has(t));
-  }, [watchlistItems, allHomeTickers]);
+  const indexSet = useMemo(
+    () => new Set<string>(INDEX_TICKERS.map((i) => i.t)),
+    [],
+  );
 
-  const { quotesMap: homeQuotesMap, isLoading: homeLoading } =
-    useQuotes(allHomeTickers);
-  const { quotesMap: watchlistQuotesMap, isLoading: watchlistLoading } =
-    useQuotes(watchlistOnlyTickers);
+  const popularRows = useMemo(
+    () =>
+      (popularData?.tickers ?? [])
+        .filter((s) => !indexSet.has(s.ticker))
+        .map((s) =>
+          isSummaryReady(s) ? summaryToPulseRow(s) : emptyRow(s.ticker, s.description || s.ticker),
+        ),
+    [popularData, indexSet],
+  );
 
-  const watchlistMergedMap = useMemo(() => {
-    const merged = new Map(homeQuotesMap);
-    for (const [k, v] of watchlistQuotesMap) merged.set(k, v);
-    return merged;
-  }, [homeQuotesMap, watchlistQuotesMap]);
+  const summaryTickers = useMemo(() => {
+    const tickers = [
+      ...watchlistItems.map((w) => w.t),
+      ...recentItems.map((r) => r.t),
+      ...INDEX_TICKERS.map((i) => i.t),
+    ];
+    return [...new Set(tickers.map((t) => t.toUpperCase()))];
+  }, [watchlistItems, recentItems]);
+
+  const { summariesMap, isLoading: summariesLoading } =
+    useOptionsSummaries(summaryTickers);
+
+  const favoriteRows = useMemo(() => {
+    return watchlistItems.map((item) =>
+      rowFromSummary(
+        summariesMap.get(item.t.toUpperCase()),
+        item.t.toUpperCase(),
+        item.n,
+      ),
+    );
+  }, [watchlistItems, summariesMap]);
+
+  const recentRows = useMemo(() => {
+    return recentItems.map((item) =>
+      rowFromSummary(
+        summariesMap.get(item.t.toUpperCase()),
+        item.t.toUpperCase(),
+        item.n,
+      ),
+    );
+  }, [recentItems, summariesMap]);
+
+  const indexRows = useMemo(() => {
+    return INDEX_TICKERS.map((item) =>
+      rowFromSummary(summariesMap.get(item.t), item.t, item.n),
+    );
+  }, [summariesMap]);
 
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Market Overview
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Click any card to open the Options Explorer.
-        </p>
-      </div>
-
-      <MarketCards quotesMap={homeQuotesMap} isLoading={homeLoading} />
-      <ActiveTickers
-        tickers={popularTickers}
-        quotesMap={homeQuotesMap}
-        isLoading={homeLoading}
-      />
-      <WatchlistCards
-        quotesMap={watchlistMergedMap}
-        isLoading={watchlistLoading || homeLoading}
+    <div className="p-4 md:p-6">
+      <OptionsPulse
+        favorites={favoriteRows}
+        recent={recentRows}
+        indexes={indexRows}
+        popular={popularRows}
+        favoritesLoading={summariesLoading}
+        recentLoading={summariesLoading}
+        indexesLoading={summariesLoading}
+        popularLoading={popularLoading}
+        onRemoveRecent={removeRecentTicker}
+        onRemoveFavorite={removeTicker}
       />
     </div>
   );

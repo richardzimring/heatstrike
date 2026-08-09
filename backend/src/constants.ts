@@ -24,15 +24,16 @@ export const TRADIER_BASE_URL = 'https://sandbox.tradier.com/v1/markets';
 
 // Cache Configuration
 export const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
-export const QUOTE_CACHE_TTL_MS = 60 * 1000; // 60 seconds for lightweight quote cache
 export const PROCESSING_LOCK_TTL_MS = 90 * 1000; // 90 seconds lock for in-flight fetches
 
 // Options Configuration
 export const MAX_EXPIRATIONS = 20;
 export const TRADIER_CONCURRENCY = 5;
 
-// Home Page Tickers
-export const INDEX_TICKERS = ['SPY', 'QQQ', 'IWM', 'DIA'];
+// Index ETFs shown on home (quote summaries)
+export const INDEX_TICKERS = ['SPY', 'QQQ', 'IWM', 'DIA'] as const;
+
+// Popular tickers (YoloStocks / home launcher)
 export const POPULAR_TICKERS_FALLBACK = [
   'AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'META', 'GOOG', 'AMD',
 ];

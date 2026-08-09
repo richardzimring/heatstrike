@@ -76,5 +76,19 @@ export function useRecentTickers(maxRecent = DEFAULT_MAX) {
     [maxRecent],
   );
 
-  return { recents, saveRecentTicker } as const;
+  const removeRecentTicker = useCallback((ticker: string) => {
+    const current: RecentTicker[] = (() => {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+      } catch {
+        return [];
+      }
+    })();
+
+    const next = current.filter((e) => e.t !== ticker);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    notify();
+  }, []);
+
+  return { recents, saveRecentTicker, removeRecentTicker } as const;
 }

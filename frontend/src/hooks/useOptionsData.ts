@@ -22,9 +22,9 @@ async function fetchOptionsData(ticker: string): Promise<OptionsQueryData> {
   if (response.status === 202 && data && 'status' in data) {
     return {
       payload: data as ProcessingResponse,
-      staleTimeMs: parseCacheControlMaxAgeMs(
-        response.headers.get('cache-control'),
-      ) ?? DEFAULT_OPTIONS_STALE_TIME_MS,
+      staleTimeMs:
+        parseCacheControlMaxAgeMs(response.headers.get('cache-control')) ??
+        DEFAULT_OPTIONS_STALE_TIME_MS,
     };
   }
 
@@ -34,9 +34,9 @@ async function fetchOptionsData(ticker: string): Promise<OptionsQueryData> {
 
   return {
     payload: data as OptionsDataResponse,
-    staleTimeMs: parseCacheControlMaxAgeMs(
-      response.headers.get('cache-control'),
-    ) ?? DEFAULT_OPTIONS_STALE_TIME_MS,
+    staleTimeMs:
+      parseCacheControlMaxAgeMs(response.headers.get('cache-control')) ??
+      DEFAULT_OPTIONS_STALE_TIME_MS,
   };
 }
 
@@ -45,18 +45,22 @@ function isProcessing(data: OptionsResult | undefined): boolean {
 }
 
 export function useOptionsData(ticker: string) {
+  const upperTicker = ticker.toUpperCase();
+
   const query = useQuery({
-    queryKey: ['options', ticker.toUpperCase()],
-    queryFn: () => fetchOptionsData(ticker.toUpperCase()),
+    queryKey: ['options', upperTicker],
+    queryFn: () => fetchOptionsData(upperTicker),
     enabled: ticker.length > 0,
-    staleTime: (query) =>
-      query.state.data?.staleTimeMs ?? DEFAULT_OPTIONS_STALE_TIME_MS,
-    refetchInterval: (query) =>
-      isProcessing(query.state.data?.payload) ? 2000 : false,
+    staleTime: (q) =>
+      q.state.data?.staleTimeMs ?? DEFAULT_OPTIONS_STALE_TIME_MS,
+    refetchInterval: (q) =>
+      isProcessing(q.state.data?.payload) ? 2000 : false,
   });
+
+  const payload = query.data?.payload;
 
   return {
     ...query,
-    data: query.data?.payload,
+    data: payload,
   };
 }

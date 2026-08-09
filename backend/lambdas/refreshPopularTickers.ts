@@ -1,7 +1,6 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import {
   TICKERS_BUCKET_NAME,
-  INDEX_TICKERS,
   POPULAR_TICKERS_COUNT,
   POPULAR_TICKERS_S3_KEY,
   CRYPTO_TICKER_EXCLUSIONS,
@@ -10,8 +9,6 @@ import {
 const s3 = new S3Client({});
 
 const YOLOSTOCKS_CSV_URL = 'https://yolostocks.live/downloads/wallstreetbets.csv';
-
-const indexSet = new Set(INDEX_TICKERS);
 
 async function loadOptionableSymbols(): Promise<Set<string>> {
   const result = await s3.send(
@@ -54,12 +51,14 @@ export const handler = async (): Promise<void> => {
   console.log(`Optionable universe: ${optionable.size} symbols`);
 
   const filtered = ranked.filter(
-    (t) => optionable.has(t) && !indexSet.has(t) && !CRYPTO_TICKER_EXCLUSIONS.has(t),
+    (t) => optionable.has(t) && !CRYPTO_TICKER_EXCLUSIONS.has(t),
   );
   const top = filtered.slice(0, POPULAR_TICKERS_COUNT);
 
   if (top.length === 0) {
-    console.warn('No valid tickers after filtering — skipping write to preserve last good list');
+    console.warn(
+      'No valid tickers after filtering — skipping write to preserve last good list',
+    );
     return;
   }
 

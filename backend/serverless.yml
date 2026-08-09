@@ -70,9 +70,6 @@ functions:
           path: /data/{ticker}
           method: GET
       - httpApi:
-          path: /market/quotes
-          method: GET
-      - httpApi:
           path: /openapi.json
           method: GET
       - httpApi:
@@ -84,12 +81,14 @@ functions:
       - httpApi:
           path: /market/popular
           method: GET
-
-  WarmDefaultQuotes:
-    handler: lambdas/warmDefaultQuotes.handler
-    name: ${self:provider.stage}-${self:service}-warm-default-quotes
-    memorySize: 256
-    timeout: 15
+      - httpApi:
+          path: /market/summaries
+          method: GET
+  WarmPopularOptions:
+    handler: lambdas/warmPopularOptions.handler
+    name: ${self:provider.stage}-${self:service}-warm-popular-options
+    memorySize: 512
+    timeout: 120
     events:
       - schedule: rate(5 minutes)
 

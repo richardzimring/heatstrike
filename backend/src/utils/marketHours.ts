@@ -51,14 +51,3 @@ export function getOptionsCacheTtlMs(cacheTtlMs: number): number {
   if (isMarketOpen(eastern)) return cacheTtlMs;
   return getNextMarketOpenMs(eastern);
 }
-
-/**
- * TTL for lightweight quote cache.
- * Market hours: 5 minutes. Outside: until next market open.
- */
-export function getQuoteCacheTtlMs(): number {
-  const FIVE_MINUTES = 5 * 60 * 1000;
-  const eastern = getEasternNow();
-  if (isMarketOpen(eastern)) return FIVE_MINUTES;
-  return getNextMarketOpenMs(eastern);
-}

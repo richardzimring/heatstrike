@@ -1,2 +1,2 @@
 export { stringifyDates } from './dates';
-export { getOptionsCacheTtlMs, getQuoteCacheTtlMs } from './marketHours';
+export { getOptionsCacheTtlMs } from './marketHours';

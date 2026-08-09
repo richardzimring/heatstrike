@@ -10,22 +10,6 @@ export interface QuoteSummary {
   change_percentage: string;
 }
 
-export interface BatchQuoteSummary {
-  ticker: string;
-  description: string;
-  price: string;
-  change: string;
-  change_percentage: string;
-  volume: number;
-  average_volume: number;
-  week_52_high: number;
-  week_52_low: number;
-  prev_close: number;
-  open: number | null;
-  high: number | null;
-  low: number | null;
-}
-
 function formatChange(value: number | null): string {
   if (value === null) return '0.00';
   return value >= 0 ? `+${value.toFixed(2)}` : `${value.toFixed(2)}`;
@@ -44,7 +28,7 @@ function normalizeQuotes(raw: unknown): TradierQuote[] {
     : [result.quotes.quote];
 }
 
-function transformQuote(quote: TradierQuote): BatchQuoteSummary {
+function toQuoteSummary(quote: TradierQuote): QuoteSummary {
   const midPrice = (quote.ask + quote.bid) / 2;
   return {
     ticker: quote.symbol,
@@ -52,23 +36,14 @@ function transformQuote(quote: TradierQuote): BatchQuoteSummary {
     price: midPrice.toFixed(2),
     change: formatChange(quote.change),
     change_percentage: formatChangePercentage(quote.change_percentage),
-    volume: quote.volume,
-    average_volume: quote.average_volume,
-    week_52_high: quote.week_52_high,
-    week_52_low: quote.week_52_low,
-    prev_close: quote.prevclose ?? 0,
-    open: quote.open,
-    high: quote.high,
-    low: quote.low,
   };
 }
 
-/**
- * Fetch current stock quote from Tradier API (single ticker)
- */
-export async function fetchQuote(ticker: string): Promise<QuoteSummary> {
+async function requestQuotes(symbols: string[]): Promise<TradierQuote[]> {
+  if (symbols.length === 0) return [];
+
   const url = new URL(`${TRADIER_BASE_URL}/quotes`);
-  url.searchParams.set('symbols', ticker);
+  url.searchParams.set('symbols', symbols.join(','));
 
   const response = await fetch(url, {
     headers: {
@@ -81,57 +56,41 @@ export async function fetchQuote(ticker: string): Promise<QuoteSummary> {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  const json = await response.json();
-  const quotes = normalizeQuotes(json);
+  return normalizeQuotes(await response.json());
+}
 
-  if (quotes.length === 0) {
-    throw new Error('Invalid ticker');
-  }
-
+/**
+ * Fetch current stock quote from Tradier API (single ticker)
+ */
+export async function fetchQuote(ticker: string): Promise<QuoteSummary> {
+  const quotes = await requestQuotes([ticker]);
   const quote = quotes[0];
   if (!quote) {
     throw new Error('Invalid ticker');
   }
-  const midPrice = (quote.ask + quote.bid) / 2;
-
-  return {
-    ticker: quote.symbol,
-    description: quote.description,
-    price: midPrice.toFixed(2),
-    change: formatChange(quote.change),
-    change_percentage: formatChangePercentage(quote.change_percentage),
-  };
+  return toQuoteSummary(quote);
 }
 
 /**
- * Fetch stock quotes for multiple tickers in a single Tradier API call.
- * Returns a map of ticker -> BatchQuoteSummary.
+ * Fetch current stock quotes from Tradier API (batch).
+ * Tradier accepts comma-separated symbols in one request.
  */
-export async function fetchBatchQuotes(
-  tickers: string[],
-): Promise<Map<string, BatchQuoteSummary>> {
-  if (tickers.length === 0) return new Map();
+export async function fetchQuotes(tickers: string[]): Promise<QuoteSummary[]> {
+  const unique = [
+    ...new Set(tickers.map((t) => t.trim().toUpperCase()).filter(Boolean)),
+  ];
+  if (unique.length === 0) return [];
 
-  const url = new URL(`${TRADIER_BASE_URL}/quotes`);
-  url.searchParams.set('symbols', tickers.join(','));
+  const BATCH_SIZE = 25;
+  const results: QuoteSummary[] = [];
 
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${TRADIER_KEY}`,
-      Accept: 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Tradier batch quotes HTTP error: ${response.status}`);
+  for (let i = 0; i < unique.length; i += BATCH_SIZE) {
+    const batch = unique.slice(i, i + BATCH_SIZE);
+    const quotes = await requestQuotes(batch);
+    for (const quote of quotes) {
+      results.push(toQuoteSummary(quote));
+    }
   }
 
-  const json = await response.json();
-  const quotes = normalizeQuotes(json);
-
-  const result = new Map<string, BatchQuoteSummary>();
-  for (const quote of quotes) {
-    result.set(quote.symbol, transformQuote(quote));
-  }
-  return result;
+  return results;
 }

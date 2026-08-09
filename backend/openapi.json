@@ -463,97 +463,37 @@
           "$ref": "#/components/schemas/TickerEntry"
         }
       },
-      "QuoteSummary": {
+      "OptionsTickerSummary": {
         "type": "object",
         "properties": {
           "ticker": {
             "type": "string",
-            "example": "AAPL"
+            "example": "NVDA"
           },
           "description": {
             "type": "string",
-            "example": "Apple Inc"
+            "example": "NVIDIA Corp"
           },
           "price": {
             "type": "string",
-            "example": "213.25"
-          },
-          "change": {
-            "type": "string",
-            "example": "+1.23"
+            "example": "223.78"
           },
           "change_percentage": {
             "type": "string",
-            "example": "+0.58"
-          },
-          "volume": {
-            "type": "number",
-            "example": 47994892
-          },
-          "average_volume": {
-            "type": "number",
-            "example": 50967638
-          },
-          "week_52_high": {
-            "type": "number",
-            "example": 277.32
-          },
-          "week_52_low": {
-            "type": "number",
-            "example": 169.21
-          },
-          "prev_close": {
-            "type": "number",
-            "example": 212.02
-          },
-          "open": {
-            "type": "number",
-            "nullable": true,
-            "example": 213
-          },
-          "high": {
-            "type": "number",
-            "nullable": true,
-            "example": 215.3
-          },
-          "low": {
-            "type": "number",
-            "nullable": true,
-            "example": 211.8
-          },
-          "earnings_date": {
-            "type": "string",
-            "nullable": true,
-            "example": "2026-04-24"
+            "example": "+2.27"
           }
         },
         "required": [
           "ticker",
           "description",
           "price",
-          "change",
-          "change_percentage",
-          "volume",
-          "average_volume",
-          "week_52_high",
-          "week_52_low",
-          "prev_close",
-          "open",
-          "high",
-          "low",
-          "earnings_date"
+          "change_percentage"
         ]
       },
-      "QuotesResponse": {
+      "OptionsSummariesResponse": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/QuoteSummary"
-        }
-      },
-      "PopularTickersResponse": {
-        "type": "array",
-        "items": {
-          "type": "string"
+          "$ref": "#/components/schemas/OptionsTickerSummary"
         }
       }
     },
@@ -687,19 +627,19 @@
         }
       }
     },
-    "/market/quotes": {
+    "/market/summaries": {
       "get": {
         "tags": [
           "Market"
         ],
-        "summary": "Get batch stock quotes",
-        "description": "Returns lightweight quote summaries for the requested tickers. Reads from DynamoDB cache first, falls back to Tradier batch quotes for misses.",
+        "summary": "Get batch ticker quote summaries",
+        "description": "Returns cached quote summaries for the requested symbols (home watchlist, recent, and indexes).",
         "parameters": [
           {
             "schema": {
               "type": "string",
               "description": "Comma-separated ticker symbols (max 30)",
-              "example": "SPY,QQQ,AAPL,TSLA"
+              "example": "AAPL,SPY,COIN"
             },
             "required": true,
             "name": "tickers",
@@ -708,11 +648,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of quote summaries in the same order as requested",
+            "description": "Quote summaries in request order",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/QuotesResponse"
+                  "$ref": "#/components/schemas/OptionsSummariesResponse"
                 }
               }
             }
@@ -743,15 +683,15 @@
         "tags": [
           "Market"
         ],
-        "summary": "Get popular tickers",
-        "description": "Returns popular tickers ranked by Reddit mention activity (YoloStocks WSB data). Refreshed daily.",
+        "summary": "Get popular tickers with quote summaries",
+        "description": "Returns popular tickers ranked by Reddit mention activity, enriched with cached quote fields for the home launcher.",
         "responses": {
           "200": {
-            "description": "Array of popular ticker symbols",
+            "description": "Ranked popular tickers with quote summaries",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PopularTickersResponse"
+                  "$ref": "#/components/schemas/OptionsSummariesResponse"
                 }
               }
             }
