@@ -32,9 +32,9 @@ function StatBadge({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="flex items-center gap-2 rounded-lg border bg-card px-3 py-1.5 cursor-default">
+        <div className="flex items-center gap-1.5 rounded-md border bg-card px-2.5 py-1 cursor-default">
           <span className="text-xs text-muted-foreground">{label}</span>
-          <span className="text-sm font-semibold font-mono">{value}</span>
+          <span className="text-xs font-medium font-mono tabular-nums">{value}</span>
         </div>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-48 text-center">

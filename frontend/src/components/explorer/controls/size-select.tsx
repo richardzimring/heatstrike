@@ -12,9 +12,16 @@ import type { Metric } from '@/types';
 interface SizeSelectProps {
   value: Metric | 'none';
   onChange: (value: Metric | 'none') => void;
+  onPreview?: (value: Metric | 'none') => void;
+  onPreviewEnd?: () => void;
 }
 
-export function SizeSelect({ value, onChange }: SizeSelectProps) {
+export function SizeSelect({
+  value,
+  onChange,
+  onPreview,
+  onPreviewEnd,
+}: SizeSelectProps) {
   const selectedMetric =
     value === 'none' ? null : METRIC_OPTIONS.find((opt) => opt.value === value);
 
@@ -23,7 +30,16 @@ export function SizeSelect({ value, onChange }: SizeSelectProps) {
       <span className="text-xs text-muted-foreground whitespace-nowrap">
         Size
       </span>
-      <Select value={value} onValueChange={(v) => onChange(v as Metric | 'none')}>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          onPreviewEnd?.();
+          onChange(v as Metric | 'none');
+        }}
+        onOpenChange={(open) => {
+          if (!open) onPreviewEnd?.();
+        }}
+      >
         <SelectTrigger className="h-8 w-auto min-w-[80px] text-xs">
           <SelectValue>
             {value === 'none'
@@ -33,9 +49,20 @@ export function SizeSelect({ value, onChange }: SizeSelectProps) {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="none">None</SelectItem>
+            <SelectItem
+              value="none"
+              onPointerMove={() => onPreview?.('none')}
+              onFocus={() => onPreview?.('none')}
+            >
+              None
+            </SelectItem>
             {METRIC_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
+              <SelectItem
+                key={opt.value}
+                value={opt.value}
+                onPointerMove={() => onPreview?.(opt.value)}
+                onFocus={() => onPreview?.(opt.value)}
+              >
                 {opt.label}
               </SelectItem>
             ))}
