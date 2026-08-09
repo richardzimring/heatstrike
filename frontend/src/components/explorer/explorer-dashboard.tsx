@@ -276,7 +276,7 @@ export function ExplorerDashboard() {
           <span className="text-xl font-semibold font-mono">${data.price}</span>
           <Badge
             variant="secondary"
-            className={`gap-1 text-xs ${changeIsPositive ? 'text-emerald-500' : 'text-red-500'}`}
+            className={`gap-1 border bg-card text-xs ${changeIsPositive ? 'text-emerald-500' : 'text-red-500'}`}
           >
             {changeIsPositive ? (
               <TrendingUp className="size-3" />

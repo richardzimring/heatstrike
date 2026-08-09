@@ -104,8 +104,11 @@ function TickerTile({
               <Badge
                 variant="secondary"
                 className={cn(
-                  'text-xs transition-colors group-hover:bg-card',
-                  positive ? 'text-emerald-500' : 'text-red-500',
+                  // Light: page color on card. Dark: original secondary + card hover.
+                  'border-transparent bg-background text-xs transition-colors group-hover:bg-muted dark:bg-secondary dark:group-hover:bg-card',
+                  positive
+                    ? 'text-emerald-600 dark:text-emerald-500'
+                    : 'text-red-600 dark:text-red-500',
                 )}
               >
                 {change}
